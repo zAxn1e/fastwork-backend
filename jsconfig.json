@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"],
+            "@root/*": ["./*"]
+        },
+        "target": "esnext",
+        "ignoreDeprecations": "6.0"
+    }
+}

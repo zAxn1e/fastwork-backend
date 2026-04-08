@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  FREELANCER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  displayName  String
+  role         Role
+  bio          String?
+  profileImageUrl String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  gigs         Gig[]
+  mediaAssets  MediaAsset[]
+  clientOrders Order[]   @relation("ClientOrders")
+  sellerOrders Order[]   @relation("SellerOrders")
+  writtenReviews Review[] @relation("ReviewAuthor")
+  receivedReviews Review[] @relation("ReviewTarget")
+
+  @@index([role])
+}
+
+model MediaAsset {
+  id                 Int      @id @default(autoincrement())
+  ownerId            Int
+  originalName       String
+  sourceMimeType     String
+  format             String   @default("webp")
+  width              Int
+  height             Int
+  sourceSizeBytes    Int
+  webpSizeBytes      Int
+  thumbnailSizeBytes Int
+  webpUrl            String
+  thumbnailUrl       String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@index([createdAt])
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  gigs      Gig[]
+}
+
+model Gig {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  price       Int
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  ownerId     Int
+  categoryId  Int
+
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  category    Category  @relation(fields: [categoryId], references: [id])
+
+  orders      Order[]
+  reviews     Review[]
+
+  @@index([ownerId])
+  @@index([categoryId])
+  @@index([isActive])
+  @@index([title])
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  message      String?
+  agreedPrice  Int
+  status       OrderStatus @default(PENDING)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  gigId        Int
+  clientId     Int
+  sellerId     Int
+
+  gig          Gig         @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  client       User        @relation("ClientOrders", fields: [clientId], references: [id])
+  seller       User        @relation("SellerOrders", fields: [sellerId], references: [id])
+
+  review       Review?
+
+  @@index([clientId])
+  @@index([sellerId])
+  @@index([gigId])
+  @@index([status])
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  rating      Int
+  comment     String?
+  createdAt   DateTime @default(now())
+
+  orderId     Int      @unique
+  gigId       Int
+  authorId    Int
+  targetUserId Int
+
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  gig         Gig      @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  author      User     @relation("ReviewAuthor", fields: [authorId], references: [id])
+  targetUser  User     @relation("ReviewTarget", fields: [targetUserId], references: [id])
+
+  @@index([gigId])
+  @@index([authorId])
+  @@index([targetUserId])
+}
