@@ -6,7 +6,7 @@ const { sanitizeUser } = require("@/utils/sanitizeUser");
 const profileService = require("@/services/profile.service");
 
 const getProfile = asyncHandler(async (req, res) => {
-  const user = await profileService.getProfile(req.session.userId);
+  const user = await profileService.getProfile(req.auth.userId);
   return sendSuccess(res, { user: sanitizeUser(user) });
 });
 
@@ -25,7 +25,7 @@ const updateProfile = asyncHandler(async (req, res) => {
     throw new AppError(400, "At least one updatable field is required");
   }
 
-  const updated = await profileService.updateProfile(req.session.userId, payload);
+  const updated = await profileService.updateProfile(req.auth.userId, payload);
   return sendSuccess(res, { user: sanitizeUser(updated) });
 });
 
@@ -38,7 +38,7 @@ const uploadProfileImage = asyncHandler(async (req, res) => {
   }
 
   const profileImageUrl = `/media/profiles/${path.basename(req.file.filename)}`;
-  const updated = await profileService.updateProfileImage(req.session.userId, profileImageUrl);
+  const updated = await profileService.updateProfileImage(req.auth.userId, profileImageUrl);
 
   return sendSuccess(res, {
     user: sanitizeUser(updated),
@@ -52,7 +52,7 @@ const uploadProfileImage = asyncHandler(async (req, res) => {
 });
 
 const deleteProfileImage = asyncHandler(async (req, res) => {
-  const updated = await profileService.removeProfileImage(req.session.userId);
+  const updated = await profileService.removeProfileImage(req.auth.userId);
   return sendSuccess(res, {
     user: sanitizeUser(updated),
     message: "Profile image deleted",

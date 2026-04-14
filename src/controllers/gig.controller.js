@@ -32,7 +32,7 @@ const createGig = asyncHandler(async (req, res) => {
     title: requireNonEmptyString(req.body.title, "title"),
     description: requireNonEmptyString(req.body.description, "description"),
     price: requirePositiveInt(req.body.price, "price"),
-    ownerId: requirePositiveInt(req.body.ownerId, "ownerId"),
+    ownerId: req.auth.userId,
     categoryId: requirePositiveInt(req.body.categoryId, "categoryId"),
   };
 
@@ -63,10 +63,6 @@ const updateGig = asyncHandler(async (req, res) => {
     payload.price = optionalPositiveInt(req.body.price, "price");
   }
 
-  if (req.body.ownerId !== undefined) {
-    payload.ownerId = optionalPositiveInt(req.body.ownerId, "ownerId");
-  }
-
   if (req.body.categoryId !== undefined) {
     payload.categoryId = optionalPositiveInt(req.body.categoryId, "categoryId");
   }
@@ -78,13 +74,13 @@ const updateGig = asyncHandler(async (req, res) => {
     payload.isActive = req.body.isActive;
   }
 
-  const updated = await gigService.updateGig(id, payload);
+  const updated = await gigService.updateGig(id, payload, req.auth.userId);
   return sendSuccess(res, updated);
 });
 
 const deleteGig = asyncHandler(async (req, res) => {
   const id = parseId(req.params.id);
-  await gigService.deleteGig(id);
+  await gigService.deleteGig(id, req.auth.userId);
 
   return res.status(200).json({
     success: true,
@@ -94,10 +90,35 @@ const deleteGig = asyncHandler(async (req, res) => {
   });
 });
 
+const listGigMedia = asyncHandler(async (req, res) => {
+  const id = parseId(req.params.id);
+  const items = await gigService.listGigMedia(id);
+  return sendSuccess(res, items.map((item) => item.mediaAsset));
+});
+
+const uploadGigMedia = asyncHandler(async (req, res) => {
+  const id = parseId(req.params.id);
+  if (!req.file) {
+    throw new AppError(400, "file is required");
+  }
+  const item = await gigService.uploadGigMedia(id, req.auth.userId, req.file);
+  return sendSuccess(res, item, 201);
+});
+
+const deleteGigMedia = asyncHandler(async (req, res) => {
+  const id = parseId(req.params.id);
+  const mediaAssetId = parseId(req.params.mediaId, "mediaId");
+  await gigService.deleteGigMedia(id, mediaAssetId, req.auth.userId);
+  return sendSuccess(res, { message: "Gig media deleted" });
+});
+
 module.exports = {
   listGigs,
   getGigById,
   createGig,
   updateGig,
   deleteGig,
+  listGigMedia,
+  uploadGigMedia,
+  deleteGigMedia,
 };
