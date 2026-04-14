@@ -26,7 +26,7 @@ const cors = require("cors");
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "*",
   allowedHeaders: ["Content-Type", "x-api-key", "Authorization"],
 }));
 app.use(express.json());
