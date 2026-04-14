@@ -81,7 +81,7 @@ sidebar_position: 2
 
 ## Request/Response Contract Notes
 
-- ทุก request ที่เป็น business endpoint ต้องมี `x-api-key` (ถ้าเปิด `API_KEY_REQUIRED=true`)
+- ทุก request ที่เป็น business endpoint ต้องมี `x-api-key` (ถ้าเปิด `API_KEY_REQUIRED=true`) รวม `/admin/*`
 - ใช้ `Authorization: Bearer <token>` ใน request ที่ต้อง login (auth/profile/media/gig manage)
 - จัดการ 401 และ 403 ที่ชั้น http client กลาง
 
