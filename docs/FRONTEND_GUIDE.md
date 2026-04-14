@@ -66,7 +66,7 @@ VITE_ENABLE_API_KEY=true
 
 แนวคิด
 
-- ถ้า backend ใช้ API_KEY_REQUIRED=true ให้ frontend ส่ง x-api-key ใน business API กลุ่ม /categories, /gigs, /orders, /reviews
+- ถ้า backend ใช้ API_KEY_REQUIRED=true ให้ frontend ส่ง x-api-key ใน business API กลุ่ม /categories, /gigs, /orders, /reviews และ /admin
 - ถ้า API_KEY_REQUIRED=false สามารถไม่ส่งได้ แต่ควรเก็บโค้ดให้รองรับไว้
 
 ## 5) การตั้งค่า HTTP client สำคัญมาก
@@ -128,6 +128,7 @@ frontend ควร map message ไปแสดง toast/alert ให้ user เ
 
 - หน้า private (profile/media/orders/create-edit gig) ต้องเช็ค auth state
 - ถ้าเรียก /auth/me แล้วได้ 401 ให้ redirect ไป /login
+- ถ้า `me.role === 'ADMIN'` ให้แยก route ไปหน้า admin dashboard
 
 ## 7) Profile + Profile Image flow
 
@@ -192,6 +193,7 @@ const avatarUrl = `${API_BASE_URL}${user.profileImageUrl}`;
 - Gig List + Filter Page
 - Gig Manage Page (create/edit + upload media)
 - Order List Page
+- Admin Dashboard Page (summary + manage users/categories/gigs/orders/reviews)
 
 ## 10) React Query key ที่แนะนำ
 
@@ -201,6 +203,12 @@ const avatarUrl = `${API_BASE_URL}${user.profileImageUrl}`;
 - ['media','detail', id]
 - ['gigs', filters]
 - ['orders', filters]
+- ['admin', 'summary']
+- ['admin', 'users', filters]
+- ['admin', 'categories']
+- ['admin', 'gigs', filters]
+- ['admin', 'orders', filters]
+- ['admin', 'reviews']
 
 เมื่อ upload/delete media ให้ invalidate ['media','list']
 
