@@ -27,7 +27,13 @@ npm start
 
 ## Base URL
 
+ค่า default สำหรับ local:
+
+```text
 http://localhost:3000
+```
+
+สำหรับ environment อื่น (staging/prod) ให้ตั้งค่า `OPENAPI_SERVER_URL` ใน `.env` เพื่อให้ Swagger/OpenAPI แสดง endpoint base URL ให้ตรงกับที่ deploy จริง
 
 ## Authentication
 

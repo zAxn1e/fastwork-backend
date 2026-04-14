@@ -15,8 +15,8 @@ slug: /
 
 ## เอกสารที่ควรใช้ร่วมกัน
 
-- Swagger UI (live API): http://localhost:3000/docs
-- OpenAPI JSON: http://localhost:3000/openapi.json
+- Swagger UI (live API): `${VITE_API_BASE_URL}/docs`
+- OpenAPI JSON: `${VITE_API_BASE_URL}/openapi.json`
 - Backend summary: ../docs/API.md
 
 ## ลำดับเริ่มทำที่แนะนำ

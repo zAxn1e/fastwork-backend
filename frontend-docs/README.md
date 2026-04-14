@@ -28,4 +28,4 @@ npm run build
 
 - This docs site is for frontend team integration with fastwork-backend.
 - Backend API summary is in ../docs/API.md
-- Swagger UI is served by backend at http://localhost:3000/docs
+- Swagger UI is served by backend at `${VITE_API_BASE_URL}/docs` (local example: `http://localhost:3000/docs`)
