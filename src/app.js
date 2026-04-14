@@ -1,14 +1,10 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const session = require("express-session");
 const swaggerUi = require("swagger-ui-express");
 const { openApiSpec } = require("@/docs/openapi");
 const {
     mediaBaseDir,
-    nodeEnv,
-    sessionSecret,
-    sessionCookieName,
     frontendDocsEnabled,
     frontendDocsPath,
     frontendDocsDistDir,
@@ -23,9 +19,14 @@ const categoryRoutes = require("@/routes/category.routes");
 const gigRoutes = require("@/routes/gig.routes");
 const orderRoutes = require("@/routes/order.routes");
 const reviewRoutes = require("@/routes/review.routes");
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors({
+  origin: "http://localhost:5173",
+  allowedHeaders: ["Content-Type", "x-api-key", "Authorization"],
+}));
 app.use(express.json());
 
 const absoluteMediaDir = path.resolve(process.cwd(), mediaBaseDir);
@@ -33,21 +34,6 @@ const absoluteFrontendDocsDistDir = path.resolve(process.cwd(), frontendDocsDist
 fs.mkdirSync(path.join(absoluteMediaDir, "profiles"), { recursive: true });
 fs.mkdirSync(path.join(absoluteMediaDir, "uploads"), { recursive: true });
 fs.mkdirSync(path.join(absoluteMediaDir, "thumbnails"), { recursive: true });
-
-app.use(
-    session({
-        name: sessionCookieName,
-        secret: sessionSecret,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: nodeEnv === "production",
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-        },
-    }),
-);
 
 app.use("/media", express.static(absoluteMediaDir));
 

@@ -1,7 +1,10 @@
-const { apiKeyRequired, port, sessionCookieName } = require("@/config/env");
+const { apiKeyRequired, jwtExpiresIn, port } = require("@/config/env");
 
 const protectedSecurity = apiKeyRequired ? [{ ApiKeyAuth: [] }] : [];
-const sessionSecurity = [{ SessionAuth: [] }];
+const jwtSecurity = [{ BearerAuth: [] }];
+const protectedWithJwtSecurity = apiKeyRequired
+  ? [{ ApiKeyAuth: [], BearerAuth: [] }]
+  : [{ BearerAuth: [] }];
 
 const openApiSpec = {
   openapi: "3.0.3",
@@ -30,11 +33,11 @@ const openApiSpec = {
         name: "x-api-key",
         description: "Internal API key header",
       },
-      SessionAuth: {
-        type: "apiKey",
-        in: "cookie",
-        name: sessionCookieName,
-        description: "Session cookie from login",
+      BearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description: "JWT access token from /auth/login or /auth/register",
       },
     },
     schemas: {
@@ -81,6 +84,17 @@ const openApiSpec = {
           updatedAt: { type: "string", format: "date-time" },
           owner: { $ref: "#/components/schemas/User" },
           category: { $ref: "#/components/schemas/Category" },
+          mediaLinks: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "integer", example: 10 },
+                sortOrder: { type: "integer", example: 1 },
+                mediaAsset: { $ref: "#/components/schemas/MediaAsset" },
+              },
+            },
+          },
         },
       },
       Order: {
@@ -209,7 +223,7 @@ const openApiSpec = {
     "/auth/register": {
       post: {
         tags: ["Auth"],
-        summary: "Register a new user and start session",
+        summary: "Register a new user and return JWT",
         security: [],
         requestBody: {
           required: true,
@@ -232,6 +246,26 @@ const openApiSpec = {
         responses: {
           201: {
             description: "Registered successfully",
+            content: {
+              "application/json": {
+                example: {
+                  success: true,
+                  data: {
+                    user: {
+                      id: 9,
+                      email: "newuser@example.com",
+                      displayName: "New User",
+                      role: "CLIENT",
+                    },
+                    auth: {
+                      tokenType: "Bearer",
+                      accessToken: "<jwt-token>",
+                      expiresIn: jwtExpiresIn,
+                    },
+                  },
+                },
+              },
+            },
           },
           409: {
             description: "Email already exists",
@@ -247,7 +281,7 @@ const openApiSpec = {
     "/auth/login": {
       post: {
         tags: ["Auth"],
-        summary: "Login and create session",
+        summary: "Login and return JWT",
         security: [],
         requestBody: {
           required: true,
@@ -267,6 +301,26 @@ const openApiSpec = {
         responses: {
           200: {
             description: "Logged in successfully",
+            content: {
+              "application/json": {
+                example: {
+                  success: true,
+                  data: {
+                    user: {
+                      id: 4,
+                      email: "client1@internal.local",
+                      displayName: "Client One",
+                      role: "CLIENT",
+                    },
+                    auth: {
+                      tokenType: "Bearer",
+                      accessToken: "<jwt-token>",
+                      expiresIn: jwtExpiresIn,
+                    },
+                  },
+                },
+              },
+            },
           },
           401: {
             description: "Invalid credentials",
@@ -282,8 +336,8 @@ const openApiSpec = {
     "/auth/logout": {
       post: {
         tags: ["Auth"],
-        summary: "Logout current session",
-        security: sessionSecurity,
+        summary: "Logout current token context",
+        security: jwtSecurity,
         responses: {
           200: {
             description: "Logout success",
@@ -302,8 +356,8 @@ const openApiSpec = {
     "/auth/me": {
       get: {
         tags: ["Auth"],
-        summary: "Get current session user",
-        security: sessionSecurity,
+        summary: "Get current authenticated user",
+        security: jwtSecurity,
         responses: {
           200: {
             description: "Current user",
@@ -323,7 +377,7 @@ const openApiSpec = {
       get: {
         tags: ["Profile"],
         summary: "Get my profile",
-        security: sessionSecurity,
+        security: jwtSecurity,
         responses: {
           200: {
             description: "Profile detail",
@@ -333,7 +387,7 @@ const openApiSpec = {
       patch: {
         tags: ["Profile"],
         summary: "Update profile fields",
-        security: sessionSecurity,
+        security: jwtSecurity,
         requestBody: {
           required: true,
           content: {
@@ -359,7 +413,7 @@ const openApiSpec = {
       post: {
         tags: ["Profile"],
         summary: "Upload profile image",
-        security: sessionSecurity,
+        security: jwtSecurity,
         requestBody: {
           required: true,
           content: {
@@ -394,7 +448,7 @@ const openApiSpec = {
       delete: {
         tags: ["Profile"],
         summary: "Delete profile image",
-        security: sessionSecurity,
+        security: jwtSecurity,
         responses: {
           200: {
             description: "Profile image deleted",
@@ -406,7 +460,7 @@ const openApiSpec = {
       get: {
         tags: ["Media"],
         summary: "List my media assets",
-        security: sessionSecurity,
+        security: jwtSecurity,
         responses: {
           200: {
             description: "My media assets",
@@ -432,7 +486,7 @@ const openApiSpec = {
       post: {
         tags: ["Media"],
         summary: "Upload image media and auto convert to webp + thumbnail",
-        security: sessionSecurity,
+        security: jwtSecurity,
         requestBody: {
           required: true,
           content: {
@@ -481,7 +535,7 @@ const openApiSpec = {
       get: {
         tags: ["Media"],
         summary: "Get media asset by id",
-        security: sessionSecurity,
+        security: jwtSecurity,
         parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
         responses: {
           200: {
@@ -511,7 +565,7 @@ const openApiSpec = {
       delete: {
         tags: ["Media"],
         summary: "Delete media asset",
-        security: sessionSecurity,
+        security: jwtSecurity,
         parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
         responses: {
           200: {
@@ -621,20 +675,19 @@ const openApiSpec = {
       },
       post: {
         tags: ["Gigs"],
-        summary: "Create gig",
-        security: protectedSecurity,
+        summary: "Create gig (owner from JWT)",
+        security: protectedWithJwtSecurity,
         requestBody: {
           required: true,
           content: {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["title", "description", "price", "ownerId", "categoryId"],
+                required: ["title", "description", "price", "categoryId"],
                 properties: {
                   title: { type: "string" },
                   description: { type: "string" },
                   price: { type: "integer", minimum: 1 },
-                  ownerId: { type: "integer", minimum: 1 },
                   categoryId: { type: "integer", minimum: 1 },
                   isActive: { type: "boolean", default: true },
                 },
@@ -693,8 +746,8 @@ const openApiSpec = {
       },
       put: {
         tags: ["Gigs"],
-        summary: "Update gig",
-        security: protectedSecurity,
+        summary: "Update gig (owner only)",
+        security: protectedWithJwtSecurity,
         parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
         requestBody: {
           required: true,
@@ -706,7 +759,6 @@ const openApiSpec = {
                   title: { type: "string" },
                   description: { type: "string" },
                   price: { type: "integer", minimum: 1 },
-                  ownerId: { type: "integer", minimum: 1 },
                   categoryId: { type: "integer", minimum: 1 },
                   isActive: { type: "boolean" },
                 },
@@ -733,8 +785,8 @@ const openApiSpec = {
       },
       delete: {
         tags: ["Gigs"],
-        summary: "Delete gig",
-        security: protectedSecurity,
+        summary: "Delete gig (owner only)",
+        security: protectedWithJwtSecurity,
         parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
         responses: {
           200: {
@@ -747,6 +799,80 @@ const openApiSpec = {
                 },
               },
             },
+          },
+        },
+      },
+    },
+    "/gigs/{id}/media": {
+      get: {
+        tags: ["Gigs"],
+        summary: "List gig media assets",
+        security: protectedSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "Gig media list",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/MediaAsset" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/gigs/{id}/media/upload": {
+      post: {
+        tags: ["Gigs"],
+        summary: "Upload media for gig (owner only)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["file"],
+                properties: {
+                  file: {
+                    type: "string",
+                    format: "binary",
+                    description: "Image file (jpeg/png/webp/gif/tiff)",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Uploaded and linked to gig",
+          },
+        },
+      },
+    },
+    "/gigs/{id}/media/{mediaId}": {
+      delete: {
+        tags: ["Gigs"],
+        summary: "Delete gig media (owner only)",
+        security: protectedWithJwtSecurity,
+        parameters: [
+          { in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } },
+          { in: "path", name: "mediaId", required: true, schema: { type: "integer", minimum: 1 } },
+        ],
+        responses: {
+          200: {
+            description: "Gig media deleted",
           },
         },
       },

@@ -57,6 +57,7 @@ model MediaAsset {
   updatedAt          DateTime @updatedAt
 
   owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  gigLinks GigMedia[]
 
   @@index([ownerId])
   @@index([createdAt])
@@ -87,11 +88,28 @@ model Gig {
 
   orders      Order[]
   reviews     Review[]
+  mediaLinks  GigMedia[]
 
   @@index([ownerId])
   @@index([categoryId])
   @@index([isActive])
   @@index([title])
+}
+
+model GigMedia {
+  id           Int       @id @default(autoincrement())
+  gigId        Int
+  mediaAssetId Int
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  gig        Gig       @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  mediaAsset MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+
+  @@unique([gigId, mediaAssetId])
+  @@index([gigId])
+  @@index([mediaAssetId])
 }
 
 model Order {
