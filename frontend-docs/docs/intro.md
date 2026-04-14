@@ -9,6 +9,7 @@ slug: /
 
 - เชื่อมระบบ auth แบบ JWT ได้ครบ
 - ใช้งาน API หลัก (gigs, orders, reviews, categories) ได้ครบ
+- รองรับ admin flow (dashboard + manage resources) สำหรับ role `ADMIN`
 - จัดการ profile image และ media assets ได้ครบ flow
 - มีมาตรฐานการจัดโครงสร้าง, state, และ testing ที่ทำงานเป็นทีมได้ง่าย
 

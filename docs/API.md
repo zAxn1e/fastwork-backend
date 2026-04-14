@@ -32,7 +32,7 @@ http://localhost:3000
 ## Authentication
 
 - API นี้เป็น Internal API
-- endpoint กลุ่ม business (`/categories`, `/gigs`, `/orders`, `/reviews`) ต้องส่ง x-api-key (เมื่อ `API_KEY_REQUIRED=true`)
+- endpoint กลุ่ม business (`/categories`, `/gigs`, `/orders`, `/reviews`, `/admin`) ต้องส่ง x-api-key (เมื่อ `API_KEY_REQUIRED=true`)
 - รูปแบบ header
 
 ```http
@@ -44,7 +44,7 @@ Public endpoints
 - กลุ่ม auth/profile/media-assets ใช้ JWT เป็นหลักและไม่ผ่าน middleware api-key
 
 Protected endpoints
-- กลุ่ม `/categories`, `/gigs`, `/orders`, `/reviews` (เมื่อ `API_KEY_REQUIRED=true`)
+- กลุ่ม `/categories`, `/gigs`, `/orders`, `/reviews`, `/admin` (เมื่อ `API_KEY_REQUIRED=true`)
 
 JWT auth
 - Login/Register จะคืน `accessToken`

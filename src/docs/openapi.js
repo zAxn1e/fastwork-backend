@@ -24,6 +24,7 @@ const openApiSpec = {
     { name: "Gigs" },
     { name: "Orders" },
     { name: "Reviews" },
+    { name: "Admin" },
   ],
   components: {
     securitySchemes: {
@@ -193,6 +194,44 @@ const openApiSpec = {
             items: { $ref: "#/components/schemas/Review" },
           },
         },
+      },
+      SuccessMessage: {
+        type: "object",
+        properties: {
+          success: { type: "boolean", example: true },
+          data: {
+            type: "object",
+            properties: {
+              message: { type: "string", example: "Deleted successfully" },
+            },
+          },
+        },
+      },
+      AdminSummary: {
+        type: "object",
+        properties: {
+          users: { type: "integer", example: 12 },
+          gigs: { type: "integer", example: 24 },
+          orders: { type: "integer", example: 18 },
+          reviews: { type: "integer", example: 10 },
+          categories: { type: "integer", example: 6 },
+        },
+      },
+      AdminCategory: {
+        allOf: [
+          { $ref: "#/components/schemas/Category" },
+          {
+            type: "object",
+            properties: {
+              _count: {
+                type: "object",
+                properties: {
+                  gigs: { type: "integer", example: 4 },
+                },
+              },
+            },
+          },
+        ],
       },
     },
   },
@@ -1096,6 +1135,533 @@ const openApiSpec = {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/summary": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get admin dashboard summary",
+        security: protectedWithJwtSecurity,
+        responses: {
+          200: {
+            description: "Admin summary",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/AdminSummary" },
+                  },
+                },
+              },
+            },
+          },
+          403: {
+            description: "Admin access required",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/users": {
+      get: {
+        tags: ["Admin"],
+        summary: "List users (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [
+          { in: "query", name: "q", schema: { type: "string" }, description: "Search by email/displayName" },
+          { in: "query", name: "role", schema: { type: "string", enum: ["CLIENT", "FREELANCER", "ADMIN"] } },
+        ],
+        responses: {
+          200: {
+            description: "User list",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/User" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/users/{id}": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get user by id (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "User detail",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/User" },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: "User not found",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+      patch: {
+        tags: ["Admin"],
+        summary: "Update user fields (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  displayName: { type: "string" },
+                  bio: { type: "string" },
+                  role: { type: "string", enum: ["CLIENT", "FREELANCER", "ADMIN"] },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "User updated",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/User" },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: "Validation error",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Admin"],
+        summary: "Delete user (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "User deleted",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SuccessMessage" },
+              },
+            },
+          },
+          409: {
+            description: "Conflict (e.g. deleting last admin)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/categories": {
+      get: {
+        tags: ["Admin"],
+        summary: "List categories (admin)",
+        security: protectedWithJwtSecurity,
+        responses: {
+          200: {
+            description: "Category list with counts",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/AdminCategory" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["Admin"],
+        summary: "Create category (admin)",
+        security: protectedWithJwtSecurity,
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["name"],
+                properties: {
+                  name: { type: "string", example: "Data Science" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Category created",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/Category" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/categories/{id}": {
+      patch: {
+        tags: ["Admin"],
+        summary: "Update category (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["name"],
+                properties: {
+                  name: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Category updated",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/Category" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Admin"],
+        summary: "Delete category (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "Category deleted",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SuccessMessage" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/gigs": {
+      get: {
+        tags: ["Admin"],
+        summary: "List gigs (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [
+          { in: "query", name: "q", schema: { type: "string" } },
+          { in: "query", name: "categoryId", schema: { type: "integer" } },
+          { in: "query", name: "isActive", schema: { type: "boolean" } },
+        ],
+        responses: {
+          200: {
+            description: "Gig list",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SuccessGigList" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/gigs/{id}": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get gig by id (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "Gig detail",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/Gig" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      patch: {
+        tags: ["Admin"],
+        summary: "Update gig fields (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  description: { type: "string" },
+                  price: { type: "integer", minimum: 1 },
+                  categoryId: { type: "integer", minimum: 1 },
+                  ownerId: { type: "integer", minimum: 1 },
+                  isActive: { type: "boolean" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Gig updated",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/Gig" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Admin"],
+        summary: "Delete gig (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "Gig deleted",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SuccessMessage" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/orders": {
+      get: {
+        tags: ["Admin"],
+        summary: "List orders (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [
+          { in: "query", name: "clientId", schema: { type: "integer" } },
+          { in: "query", name: "sellerId", schema: { type: "integer" } },
+          {
+            in: "query",
+            name: "status",
+            schema: { type: "string", enum: ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"] },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Order list",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SuccessOrderList" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/orders/{id}": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get order by id (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "Order detail",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/Order" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/orders/{id}/status": {
+      patch: {
+        tags: ["Admin"],
+        summary: "Update order status (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["status"],
+                properties: {
+                  status: {
+                    type: "string",
+                    enum: ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"],
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: "Order updated",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/Order" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/reviews": {
+      get: {
+        tags: ["Admin"],
+        summary: "List reviews (admin)",
+        security: protectedWithJwtSecurity,
+        responses: {
+          200: {
+            description: "Review list",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SuccessReviewList" },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/admin/reviews/{id}": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get review by id (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "Review detail",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    data: { $ref: "#/components/schemas/Review" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["Admin"],
+        summary: "Delete review (admin)",
+        security: protectedWithJwtSecurity,
+        parameters: [{ in: "path", name: "id", required: true, schema: { type: "integer", minimum: 1 } }],
+        responses: {
+          200: {
+            description: "Review deleted",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/SuccessMessage" },
               },
             },
           },
