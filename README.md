@@ -150,7 +150,8 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fastwork_mini?schema
 
 - DATABASE_URL: Prisma PostgreSQL connection string
 - PORT: พอร์ตของ API server (ค่าเริ่มต้น 3000)
-- OPENAPI_SERVER_URL: base URL สำหรับ OpenAPI `servers` และ URL ที่ Swagger UI ใช้โหลด `/openapi.json` (เช่น `https://api.example.com`)
+- OPENAPI_SERVER_URL: base URL เดี่ยว fallback สำหรับ OpenAPI/Swagger (เช่น `https://api.example.com`)
+- OPENAPI_SERVER_URLS: รายการ base URL หลายตัว (คั่นด้วย comma) สำหรับแสดงใน Swagger servers dropdown (เช่น `https://api.example.com,https://staging-api.example.com`)
 - INTERNAL_API_KEY: API key ที่บังคับใช้กับทุก endpoint ยกเว้น /health
 - API_KEY_REQUIRED: เปิด/ปิดการบังคับ x-api-key (`true` หรือ `false`)
 - JWT_SECRET: secret สำหรับ sign JWT token
@@ -194,7 +195,7 @@ npm run start:with-frontend-docs
 Swagger docs
 - UI: http://localhost:3000/docs
 - OpenAPI JSON: http://localhost:3000/openapi.json
-- ถ้า deploy แล้ว domain ไม่ใช่ localhost ให้ตั้ง `OPENAPI_SERVER_URL` ใน `.env` เพื่อให้ endpoint ใน Swagger ชี้ไป URL จริง
+- ถ้า deploy แล้ว domain ไม่ใช่ localhost ให้ตั้ง `OPENAPI_SERVER_URLS` (หรืออย่างน้อย `OPENAPI_SERVER_URL`) ใน `.env` เพื่อให้ Swagger แสดง servers ตาม environment
 
 Frontend docs (เสิร์ฟจาก backend)
 - URL: http://localhost:3000/frontend-guide

@@ -8,7 +8,7 @@ const {
     frontendDocsEnabled,
     frontendDocsPath,
     frontendDocsDistDir,
-    openApiServerUrl,
+    openApiServerUrls,
 } = require("@/config/env");
 const apiKeyAuth = require("@/middlewares/apiKeyAuth");
 const notFound = require("@/middlewares/notFound");
@@ -66,7 +66,7 @@ app.use(
         explorer: true,
         customSiteTitle: "Fastwork Mini Internal API Docs",
         swaggerOptions: {
-            url: `${openApiServerUrl}/openapi.json`,
+            url: `${openApiServerUrls[0]}/openapi.json`,
         },
     }),
 );
