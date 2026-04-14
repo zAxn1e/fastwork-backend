@@ -6,7 +6,7 @@ title: Setup และ Bootstrapping
 
 - Node.js >= 18
 - npm
-- backend รันที่ http://localhost:3000
+- backend ที่เข้าถึงได้จาก frontend (local หรือ deploy domain ก็ได้)
 
 ## สร้างโปรเจกต์ frontend (ตัวอย่าง Vite + React)
 
@@ -27,9 +27,15 @@ npm install axios @tanstack/react-query react-router-dom zod
 ไฟล์ .env.local
 
 ```env
-VITE_API_BASE_URL=http://localhost:3000
+VITE_API_BASE_URL=https://api.example.com
 VITE_ENABLE_API_KEY=true
 VITE_INTERNAL_API_KEY=change-this
+```
+
+สำหรับ local dev ให้ใช้ตัวอย่างนี้แทน:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
 ```
 
 ## Run

@@ -9,6 +9,16 @@ title: Env และ HTTP Client
 - VITE_INTERNAL_API_KEY -> ค่า key ที่ต้องส่ง
 - VITE_AUTH_TOKEN -> (optional) ค่า token ที่โหลดตอน bootstrap
 
+ตัวอย่าง:
+
+```env
+# deploy
+VITE_API_BASE_URL=https://api.example.com
+
+# local dev
+# VITE_API_BASE_URL=http://localhost:3000
+```
+
 ## ตัวอย่าง http client (axios)
 
 ```ts

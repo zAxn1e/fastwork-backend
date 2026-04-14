@@ -104,12 +104,53 @@ copy .env.example .env
 
 4. แก้ค่าใน .env ให้ตรงกับ PostgreSQL ในเครื่อง
 
+## PostgreSQL ด้วย Docker (ไม่รัน backend ใน container)
+
+โปรเจกต์นี้มี `docker-compose.yml` สำหรับ PostgreSQL เท่านั้น โดย backend ยังรันบนเครื่องตามปกติ (`npm run dev` หรือ `npm start`)
+
+1. start PostgreSQL
+
+```bash
+docker compose up -d
+```
+
+2. ตรวจสอบสถานะ
+
+```bash
+docker compose ps
+```
+
+3. stop PostgreSQL
+
+```bash
+docker compose down
+```
+
+ถ้าต้องการลบข้อมูลฐานข้อมูลทั้งหมด (volume)
+
+```bash
+docker compose down -v
+```
+
+ค่า default ของ DB ใน compose:
+- user: `postgres`
+- password: `postgres`
+- db: `fastwork_mini`
+- port: `5432`
+
+ดังนั้น `DATABASE_URL` ใน `.env` ใช้ค่า default นี้ได้ทันที:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fastwork_mini?schema=public"
+```
+
 ## 5) Environment Variables
 
 อ้างอิงจากไฟล์ .env.example
 
 - DATABASE_URL: Prisma PostgreSQL connection string
 - PORT: พอร์ตของ API server (ค่าเริ่มต้น 3000)
+- OPENAPI_SERVER_URL: base URL ที่จะแสดงใน Swagger/OpenAPI `servers` (เช่น `https://api.example.com`)
 - INTERNAL_API_KEY: API key ที่บังคับใช้กับทุก endpoint ยกเว้น /health
 - API_KEY_REQUIRED: เปิด/ปิดการบังคับ x-api-key (`true` หรือ `false`)
 - JWT_SECRET: secret สำหรับ sign JWT token
@@ -153,6 +194,7 @@ npm run start:with-frontend-docs
 Swagger docs
 - UI: http://localhost:3000/docs
 - OpenAPI JSON: http://localhost:3000/openapi.json
+- ถ้า deploy แล้ว domain ไม่ใช่ localhost ให้ตั้ง `OPENAPI_SERVER_URL` ใน `.env` เพื่อให้ endpoint ใน Swagger ชี้ไป URL จริง
 
 Frontend docs (เสิร์ฟจาก backend)
 - URL: http://localhost:3000/frontend-guide
