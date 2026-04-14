@@ -33,7 +33,10 @@ npm start
 http://localhost:3000
 ```
 
-สำหรับ environment อื่น (staging/prod) ให้ตั้งค่า `OPENAPI_SERVER_URL` ใน `.env` เพื่อให้ Swagger/OpenAPI แสดง endpoint base URL ให้ตรงกับที่ deploy จริง และให้หน้า Swagger UI โหลดสเปกจาก URL เดียวกัน
+สำหรับ environment อื่น (staging/prod) ให้ตั้งค่าใน `.env` ดังนี้:
+
+- `OPENAPI_SERVER_URLS` (แนะนำ): ใส่หลาย URL คั่นด้วย comma เพื่อให้ Swagger UI แสดง servers dropdown ตาม environment
+- `OPENAPI_SERVER_URL` (fallback): ใช้เมื่อไม่ได้ตั้ง `OPENAPI_SERVER_URLS`
 
 ## Authentication
 

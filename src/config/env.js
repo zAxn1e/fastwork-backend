@@ -16,6 +16,13 @@ function normalizeBaseUrl(value, fallback) {
   return raw.replace(/\/+$/, "");
 }
 
+function parseBaseUrlList(value) {
+  return String(value || "")
+    .split(",")
+    .map((item) => normalizeBaseUrl(item, ""))
+    .filter(Boolean);
+}
+
 function parseBoolean(value, defaultValue) {
   if (value === undefined) {
     return defaultValue;
@@ -49,4 +56,12 @@ module.exports = {
     process.env.OPENAPI_SERVER_URL,
     `http://localhost:${port}`,
   ),
+  openApiServerUrls: (() => {
+    const fallback = normalizeBaseUrl(
+      process.env.OPENAPI_SERVER_URL,
+      `http://localhost:${port}`,
+    );
+    const parsed = parseBaseUrlList(process.env.OPENAPI_SERVER_URLS);
+    return parsed.length ? parsed : [fallback];
+  })(),
 };
