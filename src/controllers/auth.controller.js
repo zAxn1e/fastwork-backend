@@ -6,7 +6,7 @@ const { sanitizeUser } = require("@/utils/sanitizeUser");
 const { jwtExpiresIn } = require("@/config/env");
 const { signAuthToken } = require("@/utils/jwt");
 
-const ALLOWED_ROLES = ["CLIENT", "FREELANCER", "ADMIN"];
+const ALLOWED_ROLES = ["CLIENT", "FREELANCER"];
 
 function validatePassword(password) {
   const value = requireNonEmptyString(password, "password");

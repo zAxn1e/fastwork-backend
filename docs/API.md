@@ -78,6 +78,7 @@ Error
 #### POST /auth/register
 
 สมัครผู้ใช้ใหม่และคืน JWT ทันที
+- role ที่เปิดให้สมัครได้: `CLIENT`, `FREELANCER`
 
 #### POST /auth/login
 
@@ -315,6 +316,43 @@ Business rules
 - order ต้องมีอยู่จริง
 - 1 order สร้าง review ได้แค่ 1 รายการ
 - rating ต้องเป็นจำนวนเต็ม 1-5
+
+### Admin (ต้องมี JWT ของผู้ใช้ role = ADMIN)
+
+ทุก endpoint ในกลุ่มนี้ต้องอยู่ภายใต้เงื่อนไขเดียวกัน:
+- ต้องส่ง `Authorization: Bearer <token>`
+- ถ้า `API_KEY_REQUIRED=true` ต้องส่ง `x-api-key`
+
+#### GET /admin/summary
+- สรุปจำนวน users, gigs, orders, reviews, categories
+
+#### Users
+- GET /admin/users
+- GET /admin/users/:id
+- PATCH /admin/users/:id
+- DELETE /admin/users/:id
+
+#### Categories
+- GET /admin/categories
+- POST /admin/categories
+- PATCH /admin/categories/:id
+- DELETE /admin/categories/:id
+
+#### Gigs
+- GET /admin/gigs
+- GET /admin/gigs/:id
+- PATCH /admin/gigs/:id
+- DELETE /admin/gigs/:id
+
+#### Orders
+- GET /admin/orders
+- GET /admin/orders/:id
+- PATCH /admin/orders/:id/status
+
+#### Reviews
+- GET /admin/reviews
+- GET /admin/reviews/:id
+- DELETE /admin/reviews/:id
 
 Example success response
 
