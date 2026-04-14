@@ -236,7 +236,7 @@ const openApiSpec = {
                   email: { type: "string", example: "newuser@example.com" },
                   password: { type: "string", minLength: 6, example: "Password123!" },
                   displayName: { type: "string", example: "New User" },
-                  role: { type: "string", enum: ["CLIENT", "FREELANCER", "ADMIN"], default: "CLIENT" },
+                  role: { type: "string", enum: ["CLIENT", "FREELANCER"], default: "CLIENT" },
                   bio: { type: "string" },
                 },
               },

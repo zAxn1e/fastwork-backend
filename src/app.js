@@ -19,6 +19,7 @@ const categoryRoutes = require("@/routes/category.routes");
 const gigRoutes = require("@/routes/gig.routes");
 const orderRoutes = require("@/routes/order.routes");
 const reviewRoutes = require("@/routes/review.routes");
+const adminRoutes = require("@/routes/admin.routes");
 const cors = require("cors");
 
 const app = express();
@@ -86,6 +87,7 @@ app.use("/categories", categoryRoutes);
 app.use("/gigs", gigRoutes);
 app.use("/orders", orderRoutes);
 app.use("/reviews", reviewRoutes);
+app.use("/admin", adminRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
