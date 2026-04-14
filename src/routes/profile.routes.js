@@ -1,15 +1,15 @@
 const express = require("express");
 const profileController = require("@/controllers/profile.controller");
-const requireSessionAuth = require("@/middlewares/requireSessionAuth");
+const requireJwtAuth = require("@/middlewares/requireJwtAuth");
 const { uploadProfileImage } = require("@/middlewares/uploadProfileImage");
 
 const router = express.Router();
 
-router.get("/", requireSessionAuth, profileController.getProfile);
-router.patch("/", requireSessionAuth, profileController.updateProfile);
+router.get("/", requireJwtAuth, profileController.getProfile);
+router.patch("/", requireJwtAuth, profileController.updateProfile);
 router.post(
   "/image",
-  requireSessionAuth,
+  requireJwtAuth,
   (req, res, next) => {
     uploadProfileImage(req, res, (error) => {
       if (error) {
@@ -21,6 +21,6 @@ router.post(
   },
   profileController.uploadProfileImage,
 );
-router.delete("/image", requireSessionAuth, profileController.deleteProfileImage);
+router.delete("/image", requireJwtAuth, profileController.deleteProfileImage);
 
 module.exports = router;

@@ -1,5 +1,17 @@
 const prisma = require("@/lib/prisma");
 const { AppError } = require("@/utils/http");
+const mediaAssetService = require("@/services/mediaAsset.service");
+
+const gigInclude = {
+  owner: true,
+  category: true,
+  mediaLinks: {
+    include: {
+      mediaAsset: true,
+    },
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+  },
+};
 
 function buildGigWhere(filters) {
   const where = {};
@@ -25,20 +37,14 @@ function buildGigWhere(filters) {
 async function createGig(payload) {
   return prisma.gig.create({
     data: payload,
-    include: {
-      owner: true,
-      category: true,
-    },
+    include: gigInclude,
   });
 }
 
 async function listGigs(filters) {
   return prisma.gig.findMany({
     where: buildGigWhere(filters),
-    include: {
-      owner: true,
-      category: true,
-    },
+    include: gigInclude,
     orderBy: { id: "desc" },
   });
 }
@@ -46,10 +52,7 @@ async function listGigs(filters) {
 async function getGigById(id) {
   const gig = await prisma.gig.findUnique({
     where: { id },
-    include: {
-      owner: true,
-      category: true,
-    },
+    include: gigInclude,
   });
 
   if (!gig) {
@@ -59,22 +62,91 @@ async function getGigById(id) {
   return gig;
 }
 
-async function updateGig(id, payload) {
-  await getGigById(id);
+function assertGigOwner(gig, actorUserId) {
+  if (gig.ownerId !== actorUserId) {
+    throw new AppError(403, "You can only modify your own gig");
+  }
+}
+
+async function updateGig(id, payload, actorUserId) {
+  const existing = await getGigById(id);
+  assertGigOwner(existing, actorUserId);
 
   return prisma.gig.update({
     where: { id },
     data: payload,
-    include: {
-      owner: true,
-      category: true,
-    },
+    include: gigInclude,
   });
 }
 
-async function deleteGig(id) {
-  await getGigById(id);
+async function deleteGig(id, actorUserId) {
+  const existing = await getGigById(id);
+  assertGigOwner(existing, actorUserId);
+
+  for (const link of existing.mediaLinks) {
+    await mediaAssetService.deleteMyMediaAsset(actorUserId, link.mediaAssetId);
+  }
+
   await prisma.gig.delete({ where: { id } });
+}
+
+async function listGigMedia(id) {
+  await getGigById(id);
+  return prisma.gigMedia.findMany({
+    where: { gigId: id },
+    include: { mediaAsset: true },
+    orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+  });
+}
+
+async function uploadGigMedia(id, actorUserId, file) {
+  const gig = await getGigById(id);
+  assertGigOwner(gig, actorUserId);
+
+  const mediaAsset = await mediaAssetService.createMediaAsset(actorUserId, file);
+  const maxSortOrder = await prisma.gigMedia.aggregate({
+    where: { gigId: id },
+    _max: { sortOrder: true },
+  });
+
+  await prisma.gigMedia.create({
+    data: {
+      gigId: id,
+      mediaAssetId: mediaAsset.id,
+      sortOrder: (maxSortOrder._max.sortOrder || 0) + 1,
+    },
+  });
+
+  return mediaAsset;
+}
+
+async function deleteGigMedia(id, mediaAssetId, actorUserId) {
+  const gig = await getGigById(id);
+  assertGigOwner(gig, actorUserId);
+
+  const link = await prisma.gigMedia.findUnique({
+    where: {
+      gigId_mediaAssetId: {
+        gigId: id,
+        mediaAssetId,
+      },
+    },
+  });
+
+  if (!link) {
+    throw new AppError(404, "Gig media not found");
+  }
+
+  await prisma.gigMedia.delete({
+    where: {
+      gigId_mediaAssetId: {
+        gigId: id,
+        mediaAssetId,
+      },
+    },
+  });
+
+  await mediaAssetService.deleteMyMediaAsset(actorUserId, mediaAssetId);
 }
 
 module.exports = {
@@ -83,4 +155,7 @@ module.exports = {
   getGigById,
   updateGig,
   deleteGig,
+  listGigMedia,
+  uploadGigMedia,
+  deleteGigMedia,
 };

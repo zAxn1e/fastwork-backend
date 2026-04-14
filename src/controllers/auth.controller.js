@@ -1,9 +1,10 @@
 const asyncHandler = require("@/utils/asyncHandler");
-const { AppError, sendSuccess } = require("@/utils/http");
+const { sendSuccess } = require("@/utils/http");
 const { requireEnum, requireNonEmptyString } = require("@/utils/validation");
 const authService = require("@/services/auth.service");
 const { sanitizeUser } = require("@/utils/sanitizeUser");
-const { sessionCookieName } = require("@/config/env");
+const { jwtExpiresIn } = require("@/config/env");
+const { signAuthToken } = require("@/utils/jwt");
 
 const ALLOWED_ROLES = ["CLIENT", "FREELANCER", "ADMIN"];
 
@@ -34,13 +35,17 @@ const register = asyncHandler(async (req, res) => {
     bio,
   });
 
-  req.session.userId = user.id;
+  const token = signAuthToken(user.id);
 
   return sendSuccess(
     res,
     {
       user: sanitizeUser(user),
-      session: { userId: user.id },
+      auth: {
+        tokenType: "Bearer",
+        accessToken: token,
+        expiresIn: jwtExpiresIn,
+      },
     },
     201,
   );
@@ -51,31 +56,24 @@ const login = asyncHandler(async (req, res) => {
   const password = validatePassword(req.body.password);
 
   const user = await authService.login(email, password);
-  req.session.userId = user.id;
+  const token = signAuthToken(user.id);
 
   return sendSuccess(res, {
     user: sanitizeUser(user),
-    session: { userId: user.id },
+    auth: {
+      tokenType: "Bearer",
+      accessToken: token,
+      expiresIn: jwtExpiresIn,
+    },
   });
 });
 
 const logout = asyncHandler(async (req, res) => {
-  await new Promise((resolve, reject) => {
-    req.session.destroy((error) => {
-      if (error) {
-        reject(new AppError(500, "Failed to logout"));
-        return;
-      }
-      resolve();
-    });
-  });
-
-  res.clearCookie(sessionCookieName);
   return sendSuccess(res, { message: "Logged out successfully" });
 });
 
 const me = asyncHandler(async (req, res) => {
-  const user = await authService.getMe(req.session.userId);
+  const user = await authService.getMe(req.auth.userId);
   return sendSuccess(res, { user: sanitizeUser(user) });
 });
 
