@@ -38,6 +38,9 @@ http://localhost:3000
 - `OPENAPI_SERVER_URLS` (แนะนำ): ใส่หลาย URL คั่นด้วย comma เพื่อให้ Swagger UI แสดง servers dropdown ตาม environment
 - `OPENAPI_SERVER_URL` (fallback): ใช้เมื่อไม่ได้ตั้ง `OPENAPI_SERVER_URLS`
 
+ถ้าไม่ตั้ง 2 ค่านี้ ระบบจะ auto-detect base URL จาก `x-forwarded-proto` และ `x-forwarded-host` ของ reverse proxy
+และถ้ามี `x-forwarded-host` ระบบจะใช้ค่านี้ก่อนเพื่อให้ Swagger แสดง public URL แทน localhost ภายใน
+
 ## Authentication
 
 - API นี้เป็น Internal API

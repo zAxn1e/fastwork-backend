@@ -31,6 +31,30 @@ app.use(cors({
 }));
 app.use(express.json());
 
+function firstHeaderValue(value) {
+    return String(value || "")
+        .split(",")[0]
+        .trim();
+}
+
+function resolveRequestBaseUrl(req) {
+    const host = req.get("host");
+    const proto = req.protocol || "http";
+    if (!host) {
+        return null;
+    }
+    return `${proto}://${host}`;
+}
+
+function resolveForwardedBaseUrl(req) {
+    const forwardedProto = firstHeaderValue(req.get("x-forwarded-proto"));
+    const forwardedHost = firstHeaderValue(req.get("x-forwarded-host"));
+    if (!forwardedHost) {
+        return null;
+    }
+    return `${forwardedProto || "https"}://${forwardedHost}`;
+}
+
 const absoluteMediaDir = path.resolve(process.cwd(), mediaBaseDir);
 const absoluteFrontendDocsDistDir = path.resolve(process.cwd(), frontendDocsDistDir);
 fs.mkdirSync(path.join(absoluteMediaDir, "profiles"), { recursive: true });
@@ -56,17 +80,32 @@ if (frontendDocsEnabled) {
 }
 
 app.get("/openapi.json", (_req, res) => {
-    res.json(openApiSpec);
+    const hasExplicitOpenApiEnv =
+        Boolean(String(process.env.OPENAPI_SERVER_URL || "").trim()) ||
+        Boolean(String(process.env.OPENAPI_SERVER_URLS || "").trim());
+    const forwardedBaseUrl = resolveForwardedBaseUrl(_req);
+    const requestBaseUrl = resolveRequestBaseUrl(_req);
+    const effectiveServerUrls =
+        forwardedBaseUrl
+            ? [forwardedBaseUrl]
+            : !hasExplicitOpenApiEnv && requestBaseUrl
+            ? [requestBaseUrl]
+            : openApiServerUrls;
+
+    res.json({
+        ...openApiSpec,
+        servers: effectiveServerUrls.map((url) => ({ url })),
+    });
 });
 
 app.use(
     "/docs",
     swaggerUi.serve,
-    swaggerUi.setup(openApiSpec, {
+    swaggerUi.setup(undefined, {
         explorer: true,
         customSiteTitle: "Fastwork Mini Internal API Docs",
         swaggerOptions: {
-            url: `${openApiServerUrls[0]}/openapi.json`,
+            url: "/openapi.json",
         },
     }),
 );

@@ -195,7 +195,9 @@ npm run start:with-frontend-docs
 Swagger docs
 - UI: http://localhost:3000/docs
 - OpenAPI JSON: http://localhost:3000/openapi.json
-- ถ้า deploy แล้ว domain ไม่ใช่ localhost ให้ตั้ง `OPENAPI_SERVER_URLS` (หรืออย่างน้อย `OPENAPI_SERVER_URL`) ใน `.env` เพื่อให้ Swagger แสดง servers ตาม environment
+- ถ้าไม่ตั้ง `OPENAPI_SERVER_URL/OPENAPI_SERVER_URLS` ระบบจะพยายาม auto-detect จาก `x-forwarded-proto` และ `x-forwarded-host` (เหมาะกับ nginx reverse proxy)
+- ถ้า deploy แล้วต้องการ fix ค่าเอง ให้ตั้ง `OPENAPI_SERVER_URLS` (หรืออย่างน้อย `OPENAPI_SERVER_URL`) ใน `.env`
+- ถ้ามี `x-forwarded-host` จาก reverse proxy ระบบจะใช้ค่านี้เป็นลำดับแรกเพื่อหลีกเลี่ยงการโชว์ localhost ภายใน
 
 Frontend docs (เสิร์ฟจาก backend)
 - URL: http://localhost:3000/frontend-guide
