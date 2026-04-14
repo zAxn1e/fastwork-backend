@@ -37,9 +37,29 @@ function firstHeaderValue(value) {
         .trim();
 }
 
+function isLocalHostname(hostname) {
+    const normalized = String(hostname || "").trim().toLowerCase();
+    return (
+        normalized === "localhost" ||
+        normalized === "0.0.0.0" ||
+        normalized === "::1" ||
+        normalized.startsWith("127.")
+    );
+}
+
+function isLocalServerUrl(url) {
+    try {
+        const parsed = new URL(url);
+        return isLocalHostname(parsed.hostname);
+    } catch (_error) {
+        return false;
+    }
+}
+
 function resolveRequestBaseUrl(req) {
+    const forwardedProto = firstHeaderValue(req.get("x-forwarded-proto"));
     const host = req.get("host");
-    const proto = req.protocol || "http";
+    const proto = forwardedProto || req.protocol || "http";
     if (!host) {
         return null;
     }
@@ -85,10 +105,13 @@ app.get("/openapi.json", (_req, res) => {
         Boolean(String(process.env.OPENAPI_SERVER_URLS || "").trim());
     const forwardedBaseUrl = resolveForwardedBaseUrl(_req);
     const requestBaseUrl = resolveRequestBaseUrl(_req);
+    const hasOnlyLocalConfiguredServers =
+        openApiServerUrls.length > 0 &&
+        openApiServerUrls.every((url) => isLocalServerUrl(url));
     const effectiveServerUrls =
         forwardedBaseUrl
             ? [forwardedBaseUrl]
-            : !hasExplicitOpenApiEnv && requestBaseUrl
+            : requestBaseUrl && (!hasExplicitOpenApiEnv || hasOnlyLocalConfiguredServers)
             ? [requestBaseUrl]
             : openApiServerUrls;
 
