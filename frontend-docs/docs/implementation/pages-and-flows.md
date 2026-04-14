@@ -9,6 +9,7 @@ title: หน้า UI ที่ควรทำและลำดับ flow
 - Profile Page
 - Media Library Page
 - Gig List / Gig Detail
+- Gig Manage Page (create/edit/upload media)
 - Order List
 
 ## Flow ของผู้ใช้ (ขั้นต่ำ)
@@ -17,7 +18,8 @@ title: หน้า UI ที่ควรทำและลำดับ flow
 2. เข้าหน้า Profile เพื่อแก้ข้อมูลพื้นฐาน
 3. อัปโหลด profile image
 4. ไปหน้า Media Library และอัปโหลดไฟล์ทั่วไป
-5. เรียกดู gigs และสร้าง order
+5. จัดการ gigs และ media ของ gig (สำหรับ owner)
+6. เรียกดู gigs และสร้าง order
 
 ## UX ที่แนะนำ
 

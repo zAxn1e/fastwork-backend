@@ -4,7 +4,7 @@ title: Testing Checklist ก่อนส่งงาน
 
 ## Auth
 
-- register สำเร็จและได้ session
+- register สำเร็จและได้ JWT token
 - login สำเร็จและเรียก /auth/me ได้
 - logout สำเร็จและ /auth/me กลับเป็น 401
 
@@ -23,8 +23,8 @@ title: Testing Checklist ก่อนส่งงาน
 
 ## API Key
 
-- เมื่อ backend บังคับ key -> request ที่ไม่มี key ต้อง fail 401
-- เมื่อ backend ไม่บังคับ key -> request ต้องผ่านโดยไม่ส่ง key
+- เมื่อ backend บังคับ key -> request ของ `/categories`, `/gigs`, `/orders`, `/reviews` ที่ไม่มี key ต้อง fail 401
+- เมื่อ backend ไม่บังคับ key -> business request ต้องผ่านได้แม้ไม่ส่ง key
 
 ## Regression
 

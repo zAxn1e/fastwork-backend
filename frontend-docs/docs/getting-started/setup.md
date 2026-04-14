@@ -41,4 +41,4 @@ npm run dev
 ## ข้อควรรู้
 
 - ถ้า backend เปิด API_KEY_REQUIRED=true ต้องส่ง x-api-key ใน business endpoints
-- auth เป็น session-based ต้องส่ง cookie ทุก request ที่เกี่ยวกับ session
+- auth เป็น JWT-based ต้องส่ง Authorization: Bearer ใน request ที่ต้อง login

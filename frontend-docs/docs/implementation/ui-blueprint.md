@@ -82,7 +82,7 @@ sidebar_position: 2
 ## Request/Response Contract Notes
 
 - ทุก request ที่เป็น business endpoint ต้องมี `x-api-key` (ถ้าเปิด `API_KEY_REQUIRED=true`)
-- ใช้ cookie session (`credentials: include`) ใน request ที่เกี่ยวกับ auth/profile/media
+- ใช้ `Authorization: Bearer <token>` ใน request ที่ต้อง login (auth/profile/media/gig manage)
 - จัดการ 401 และ 403 ที่ชั้น http client กลาง
 
 ## UX and Accessibility Checklist
@@ -95,7 +95,7 @@ sidebar_position: 2
 
 ## Suggested Delivery Order
 
-1. Auth pages + session integration
+1. Auth pages + JWT integration
 2. Profile page + profile image upload
 3. Gig list/detail
 4. Order list/detail

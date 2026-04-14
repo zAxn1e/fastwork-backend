@@ -6,8 +6,8 @@ title: Troubleshooting ที่เจอบ่อย
 
 สาเหตุที่พบบ่อย
 
-- ไม่ได้ส่ง withCredentials/credentials include
-- Browser policy บล็อก cookie
+- ไม่ได้ส่ง Authorization: Bearer token
+- token หมดอายุหรือถูกลบจาก storage
 - เรียกโดเมน/พอร์ตไม่ตรงกับที่ตั้งค่า
 
 ## Upload ไม่ผ่าน
@@ -31,11 +31,11 @@ title: Troubleshooting ที่เจอบ่อย
 เช็ก
 
 - backend เปิด API_KEY_REQUIRED หรือไม่
-- frontend env ส่ง key ถูกค่าในทุก request หรือไม่
+- frontend env ส่ง key ถูกค่าใน business endpoints (`/categories`, `/gigs`, `/orders`, `/reviews`) หรือไม่
 
-## CORS หรือ cookie issue เมื่อ deploy
+## CORS issue เมื่อ deploy
 
 ถ้า frontend/backend อยู่คนละโดเมนจริง
 
-- ตั้งค่า secure cookie และ sameSite ให้เหมาะกับ environment
-- ตั้ง reverse proxy ให้รองรับ cookie forwarding
+- ตั้งค่า CORS allowed origin และ allowed headers ให้รองรับ Authorization
+- ตั้ง reverse proxy ให้ forward Authorization header
