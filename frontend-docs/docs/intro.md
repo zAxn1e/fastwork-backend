@@ -15,8 +15,10 @@ slug: /
 
 ## เอกสารที่ควรใช้ร่วมกัน
 
-- Swagger UI (live API): `${VITE_API_BASE_URL}/docs`
-- OpenAPI JSON: `${VITE_API_BASE_URL}/openapi.json`
+<!-- - Swagger UI (live API): `${VITE_API_BASE_URL}/docs`
+- OpenAPI JSON: `${VITE_API_BASE_URL}/openapi.json` -->
+- Swagger UI (live API): `https://api.noctradev.com/docs`
+- OpenAPI JSON: `https://api.noctradev.com/openapi.json`
 - Backend summary: ../docs/API.md
 
 ## ลำดับเริ่มทำที่แนะนำ
