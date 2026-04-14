@@ -198,6 +198,9 @@ Swagger docs
 - ถ้าไม่ตั้ง `OPENAPI_SERVER_URL/OPENAPI_SERVER_URLS` ระบบจะพยายาม auto-detect จาก `x-forwarded-proto` และ `x-forwarded-host` (เหมาะกับ nginx reverse proxy)
 - ถ้า deploy แล้วต้องการ fix ค่าเอง ให้ตั้ง `OPENAPI_SERVER_URLS` (หรืออย่างน้อย `OPENAPI_SERVER_URL`) ใน `.env`
 - ถ้ามี `x-forwarded-host` จาก reverse proxy ระบบจะใช้ค่านี้เป็นลำดับแรกเพื่อหลีกเลี่ยงการโชว์ localhost ภายใน
+- แนะนำให้ตั้ง header ใน nginx:
+  - `proxy_set_header X-Forwarded-Host $host;`
+  - `proxy_set_header X-Forwarded-Proto $scheme;`
 
 Frontend docs (เสิร์ฟจาก backend)
 - URL: http://localhost:3000/frontend-guide

@@ -40,6 +40,9 @@ http://localhost:3000
 
 ถ้าไม่ตั้ง 2 ค่านี้ ระบบจะ auto-detect base URL จาก `x-forwarded-proto` และ `x-forwarded-host` ของ reverse proxy
 และถ้ามี `x-forwarded-host` ระบบจะใช้ค่านี้ก่อนเพื่อให้ Swagger แสดง public URL แทน localhost ภายใน
+แนะนำให้ตั้งใน nginx ด้วย:
+- `proxy_set_header X-Forwarded-Host $host;`
+- `proxy_set_header X-Forwarded-Proto $scheme;`
 
 ## Authentication
 
