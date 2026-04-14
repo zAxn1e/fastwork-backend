@@ -16,6 +16,12 @@ title: Profile และ Media Integration
 - GET /media-assets/:id
 - DELETE /media-assets/:id
 
+## Gig media endpoints
+
+- GET /gigs/:id/media
+- POST /gigs/:id/media/upload (field: file, owner only)
+- DELETE /gigs/:id/media/:mediaId (owner only)
+
 ## การแสดงผลรูป
 
 backend คืน url แบบ relative เช่น /media/uploads/... ให้ต่อกับ base URL

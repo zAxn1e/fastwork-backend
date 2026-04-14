@@ -4,8 +4,8 @@ title: API Key และ Security Integration
 
 ## x-api-key ใช้เมื่อไร
 
-- ถ้า backend ตั้ง API_KEY_REQUIRED=true -> ต้องส่ง x-api-key ใน business endpoints
-- endpoint กลุ่ม auth/profile/media ที่ใช้ session ยังควรใช้การตั้งค่าเดียวกันของโปรเจกต์
+- ถ้า backend ตั้ง API_KEY_REQUIRED=true -> ต้องส่ง x-api-key ใน business endpoints กลุ่ม `/categories`, `/gigs`, `/orders`, `/reviews`
+- endpoint กลุ่ม auth/profile/media-assets ใช้ JWT (Authorization: Bearer) โดยไม่ผ่าน middleware api-key
 
 ## แนวปฏิบัติ
 
@@ -20,5 +20,5 @@ title: API Key และ Security Integration
 
 ## ข้อควรระวัง
 
-- ถ้าเปิด API_KEY_REQUIRED ใน backend แต่ frontend ไม่ส่ง header จะเจอ 401
-- ถ้า browser block cookie หรือข้าม withCredentials จะดูเหมือน login ไม่ติด
+- ถ้าเปิด API_KEY_REQUIRED ใน backend แต่ไม่ส่ง x-api-key ใน business endpoints จะเจอ 401
+- ถ้าไม่แนบ Authorization Bearer token จะเจอ 401 ใน endpoint ที่ต้อง login
