@@ -1,6 +1,6 @@
 # Fastwork Mini Internal API
 
-โปรเจกต์นี้เป็น backend API แบบ Internal-use สาหรับระบบ freelance marketplace ขนาดเล็ก (แนว Fastwork) เพื่อใช้ในงานกลุ่มและเดโมในชั้นเรียน
+โปรเจกต์นี้เป็น backend API แบบ Internal-use สาหรับระบบ freelance marketplace ขนาดเล็ก (แนว Fastwork) เพื่อใช้ใน Project Demo ของงานกลุ่ม
 
 ## 1) ภาพรวมโปรเจกต์
 
@@ -187,6 +187,7 @@ Auth endpoints
 - POST /auth/login
 - POST /auth/logout
 - GET /auth/me
+- หมายเหตุ: `/auth/register` อนุญาต role เฉพาะ `CLIENT`, `FREELANCER`
 
 Profile endpoints (ต้องแนบ JWT ก่อน)
 - GET /profile
@@ -215,6 +216,14 @@ Gig media endpoints
 - GET /gigs/:id/media
 - POST /gigs/:id/media/upload (multipart field: file, owner only)
 - DELETE /gigs/:id/media/:mediaId (owner only)
+
+Admin endpoints (ต้องเป็นผู้ใช้ role `ADMIN` และแนบ JWT)
+- GET /admin/summary
+- Users: GET `/admin/users`, GET `/admin/users/:id`, PATCH `/admin/users/:id`, DELETE `/admin/users/:id`
+- Categories: GET/POST/PATCH/DELETE `/admin/categories...`
+- Gigs: GET/PATCH/DELETE `/admin/gigs...`
+- Orders: GET `/admin/orders`, GET `/admin/orders/:id`, PATCH `/admin/orders/:id/status`
+- Reviews: GET `/admin/reviews`, GET `/admin/reviews/:id`, DELETE `/admin/reviews/:id`
 
 ## 10) วิธีเรียก Protected Internal API (x-api-key)
 
