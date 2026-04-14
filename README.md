@@ -9,7 +9,7 @@
 - gigs
 - orders
 - reviews
-- auth (register/login/logout/session)
+- auth (register/login/logout/JWT)
 - profile (อ่าน/แก้ไขโปรไฟล์)
 - profile image upload (media เก็บใน backend)
 - media assets ทั่วไป (upload/list/get/delete)
@@ -26,7 +26,7 @@
 - bcrypt (ใช้ใน seed ของ sample users)
 - module-alias (ใช้ path แบบ @/...)
 - Swagger UI (เอกสาร API แบบ interactive)
-- express-session (session-based auth)
+- jsonwebtoken (JWT auth)
 - multer (upload รูป profile)
 
 ## 3) โครงสร้างโฟลเดอร์
@@ -54,7 +54,7 @@ src/
     apiKeyAuth.js
     errorHandler.js
     notFound.js
-    requireSessionAuth.js
+    requireJwtAuth.js
     uploadMediaAsset.js
     uploadProfileImage.js
   routes/
@@ -112,8 +112,8 @@ copy .env.example .env
 - PORT: พอร์ตของ API server (ค่าเริ่มต้น 3000)
 - INTERNAL_API_KEY: API key ที่บังคับใช้กับทุก endpoint ยกเว้น /health
 - API_KEY_REQUIRED: เปิด/ปิดการบังคับ x-api-key (`true` หรือ `false`)
-- SESSION_SECRET: secret สาหรับ sign session cookie
-- SESSION_COOKIE_NAME: ชื่อ cookie ของ session
+- JWT_SECRET: secret สำหรับ sign JWT token
+- JWT_EXPIRES_IN: อายุ token (เช่น 7d, 12h)
 - MEDIA_BASE_DIR: โฟลเดอร์เก็บไฟล์ media ใน backend
 - MAX_UPLOAD_FILE_SIZE_MB: ขนาดไฟล์อัปโหลดสูงสุด (MB)
 - WEBP_QUALITY: คุณภาพไฟล์ webp (ค่าเริ่มต้น 95)
@@ -180,7 +180,7 @@ npm run db:seed
 - หลายรายการ orders
 - 2 reviews
 
-## 9) Session Auth และ Profile
+## 9) JWT Auth และ Profile
 
 Auth endpoints
 - POST /auth/register
@@ -188,13 +188,13 @@ Auth endpoints
 - POST /auth/logout
 - GET /auth/me
 
-Profile endpoints (ต้อง login ก่อน)
+Profile endpoints (ต้องแนบ JWT ก่อน)
 - GET /profile
 - PATCH /profile
 - POST /profile/image (multipart/form-data field: image)
 - DELETE /profile/image
 
-Media assets endpoints (ต้อง login ก่อน)
+Media assets endpoints (ต้องแนบ JWT ก่อน)
 - POST /media-assets/upload (multipart field: file)
 - GET /media-assets
 - GET /media-assets/:id
@@ -209,12 +209,17 @@ Media processing ที่ระบบทาอัตโนมัติ
 Media static URL
 - GET /media/profiles/<filename>
 
-หลัง login/register สาเร็จ จะได้ session cookie จากเซิร์ฟเวอร์
+หลัง login/register สำเร็จ จะได้ JWT (`accessToken`) จากเซิร์ฟเวอร์
+
+Gig media endpoints
+- GET /gigs/:id/media
+- POST /gigs/:id/media/upload (multipart field: file, owner only)
+- DELETE /gigs/:id/media/:mediaId (owner only)
 
 ## 10) วิธีเรียก Protected Internal API (x-api-key)
 
-- Public endpoint: GET /health
-- Endpoint อื่นทั้งหมดต้องส่ง header
+- Public/JWT endpoints: GET /health, กลุ่ม /auth, /profile, /media-assets
+- Business endpoints ที่ต้องส่ง `x-api-key` เมื่อ `API_KEY_REQUIRED=true`: /categories, /gigs, /orders, /reviews
 
 ```http
 x-api-key: <INTERNAL_API_KEY>
@@ -267,12 +272,11 @@ curl -X POST http://localhost:3000/auth/register \
   -d '{"email":"newuser@example.com","password":"Password123!","displayName":"New User"}'
 ```
 
-Login (เก็บ cookie)
+Login (รับ JWT)
 
 ```bash
 curl -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
-  -c cookie.txt \
   -d '{"email":"newuser@example.com","password":"Password123!"}'
 ```
 
@@ -280,14 +284,13 @@ Upload profile image
 
 ```bash
 curl -X POST http://localhost:3000/profile/image \
-  -b cookie.txt \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
   -F "image=@./avatar.png"
 ```
 
 ## 12) ข้อจากัด / สิ่งที่ตั้งใจให้เรียบง่าย
 
-- ใช้ session-based auth แบบเรียบง่าย (ยังไม่ใช้ OAuth/JWT)
-- ยังไม่บังคับ ownership/identity authorization
+- ใช้ JWT auth แบบเรียบง่าย (ยังไม่ใช้ refresh token / OAuth)
 - ยังไม่มี pagination
 - media เก็บใน local backend (ยังไม่แยก object storage)
 
@@ -311,7 +314,7 @@ curl -X POST http://localhost:3000/profile/image \
 - โครงสร้าง frontend ที่แนะนา
 - การตั้งค่า env ฝั่ง frontend
 - การตั้งค่า HTTP client (credentials/include + x-api-key)
-- session auth flow (register/login/me/logout)
+- JWT auth flow (register/login/me/logout)
 - profile/media upload flow
 - แนวทาง state management, route guard, และ checklist ก่อนส่งงาน
 
