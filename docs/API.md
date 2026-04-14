@@ -32,23 +32,23 @@ http://localhost:3000
 ## Authentication
 
 - API นี้เป็น Internal API
-- ทุก endpoint ที่ไม่ใช่ /health ต้องส่ง x-api-key (เมื่อ `API_KEY_REQUIRED=true`)
+- endpoint กลุ่ม business (`/categories`, `/gigs`, `/orders`, `/reviews`) ต้องส่ง x-api-key (เมื่อ `API_KEY_REQUIRED=true`)
 - รูปแบบ header
 
 ```http
 x-api-key: <INTERNAL_API_KEY>
 ```
 
-Public endpoint
+Public endpoints
 - GET /health
+- กลุ่ม auth/profile/media-assets ใช้ JWT เป็นหลักและไม่ผ่าน middleware api-key
 
 Protected endpoints
-- endpoint อื่นทั้งหมด (เมื่อ `API_KEY_REQUIRED=true`)
+- กลุ่ม `/categories`, `/gigs`, `/orders`, `/reviews` (เมื่อ `API_KEY_REQUIRED=true`)
 
-Session-based auth
-- Login/Register จะสร้าง session cookie
-- Endpoint กลุ่ม profile ใช้ session cookie ในการยืนยันตัวตน
-- ฝั่ง frontend ต้องส่ง credentials include/withCredentials ทุก request ที่เกี่ยวกับ session
+JWT auth
+- Login/Register จะคืน `accessToken`
+- Endpoint กลุ่ม auth/profile/media และการแก้ไข gig ต้องส่ง `Authorization: Bearer <token>`
 - ถ้า backend เปิด API_KEY_REQUIRED=true ให้ส่ง x-api-key ใน business endpoint
 
 ## Response Format
@@ -73,23 +73,23 @@ Error
 
 ## Endpoints
 
-### Auth / Session
+### Auth / JWT
 
 #### POST /auth/register
 
-สมัครผู้ใช้ใหม่และสร้าง session ทันที
+สมัครผู้ใช้ใหม่และคืน JWT ทันที
 
 #### POST /auth/login
 
-เข้าสู่ระบบและสร้าง session
+เข้าสู่ระบบและคืน JWT
 
 #### POST /auth/logout
 
-ออกจากระบบ (ต้องมี session)
+ออกจากระบบฝั่ง API (ต้องมี JWT)
 
 #### GET /auth/me
 
-ดึงข้อมูลผู้ใช้จาก session ปัจจุบัน
+ดึงข้อมูลผู้ใช้จาก JWT ปัจจุบัน
 
 ### Profile
 
@@ -194,7 +194,7 @@ Query params
 
 ดึงข้อมูล gig ตาม id
 
-#### POST /gigs
+#### POST /gigs (ต้องมี JWT)
 
 สร้าง gig ใหม่
 
@@ -205,13 +205,12 @@ Request body
   "title": "Build Express API",
   "description": "Need CRUD endpoints",
   "price": 9000,
-  "ownerId": 2,
   "categoryId": 1,
   "isActive": true
 }
 ```
 
-#### PUT /gigs/:id
+#### PUT /gigs/:id (ต้องมี JWT และเป็น owner)
 
 อัปเดต gig (ส่งเฉพาะ field ที่ต้องการเปลี่ยนได้)
 
@@ -224,9 +223,21 @@ Request body example
 }
 ```
 
-#### DELETE /gigs/:id
+#### DELETE /gigs/:id (ต้องมี JWT และเป็น owner)
 
 ลบ gig ตาม id
+
+#### GET /gigs/:id/media
+
+ดึงรายการ media ของ gig
+
+#### POST /gigs/:id/media/upload (ต้องมี JWT และเป็น owner)
+
+อัปโหลด media (image) เข้า gig ด้วย `multipart/form-data` field `file`
+
+#### DELETE /gigs/:id/media/:mediaId (ต้องมี JWT และเป็น owner)
+
+ลบ media ของ gig
 
 ### Orders
 

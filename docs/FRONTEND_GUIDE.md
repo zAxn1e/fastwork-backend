@@ -7,7 +7,7 @@
 ## 1) เป้าหมายของ frontend
 
 - แสดงข้อมูลหลัก: categories, gigs, orders, reviews
-- รองรับ auth แบบ session-based (register/login/logout)
+- รองรับ auth แบบ JWT (register/login/logout/me)
 - รองรับ profile และ upload รูปโปรไฟล์
 - รองรับ media upload ทั่วไป พร้อม preview thumbnail
 - รองรับ internal security ผ่าน x-api-key (เมื่อ backend เปิดใช้งาน)
@@ -66,17 +66,15 @@ VITE_ENABLE_API_KEY=true
 
 แนวคิด
 
-- ถ้า backend ใช้ API_KEY_REQUIRED=true ให้ frontend ส่ง x-api-key ทุก request business API
+- ถ้า backend ใช้ API_KEY_REQUIRED=true ให้ frontend ส่ง x-api-key ใน business API กลุ่ม /categories, /gigs, /orders, /reviews
 - ถ้า API_KEY_REQUIRED=false สามารถไม่ส่งได้ แต่ควรเก็บโค้ดให้รองรับไว้
 
 ## 5) การตั้งค่า HTTP client สำคัญมาก
 
-## 5.1 ต้องส่ง cookie ทุกครั้ง
+## 5.1 ต้องส่ง Authorization Bearer ใน endpoint ที่ต้อง login
 
-เพราะ auth เป็น session-based
-
-- fetch ต้องกำหนด credentials: include
-- axios ต้องกำหนด withCredentials: true
+- เก็บ `accessToken` จาก `/auth/register` หรือ `/auth/login`
+- แนบ header: `Authorization: Bearer <accessToken>`
 
 ## 5.2 ใส่ x-api-key แบบ conditional
 
@@ -107,28 +105,28 @@ backend ส่ง error รูปแบบ
 
 frontend ควร map message ไปแสดง toast/alert ให้ user เข้าใจ
 
-## 6) Auth flow ที่แนะนำ
+## 6) Auth (JWT) flow ที่แนะนำ
 
 ## 6.1 Register
 
 - เรียก POST /auth/register
-- สำเร็จแล้วถือว่า login ทันที (session ถูกสร้าง)
+- สำเร็จแล้วถือว่า login ทันที (ได้ JWT token)
 - redirect ไปหน้า profile หรือ dashboard
 
 ## 6.2 Login
 
 - เรียก POST /auth/login
-- สำเร็จแล้วเรียก GET /auth/me เพื่อ sync user state
+- สำเร็จแล้วเก็บ token แล้วเรียก GET /auth/me เพื่อ sync user state
 
 ## 6.3 Logout
 
-- เรียก POST /auth/logout
+- เรียก POST /auth/logout พร้อม Authorization header
 - clear user state ใน frontend
 - redirect ไปหน้า login
 
 ## 6.4 Route guard
 
-- หน้า private (profile/media/orders) ต้องเช็ค auth state
+- หน้า private (profile/media/orders/create-edit gig) ต้องเช็ค auth state
 - ถ้าเรียก /auth/me แล้วได้ 401 ให้ redirect ไป /login
 
 ## 7) Profile + Profile Image flow
@@ -173,6 +171,12 @@ const avatarUrl = `${API_BASE_URL}${user.profileImageUrl}`;
 ## 8.4 ลบ media
 
 - DELETE /media-assets/:id
+
+## 8.5 Gig media upload/delete
+
+- POST /gigs/:id/media/upload (field: file, ต้องเป็นเจ้าของ gig และต้องมี JWT)
+- GET /gigs/:id/media
+- DELETE /gigs/:id/media/:mediaId (ต้องเป็นเจ้าของ gig และต้องมี JWT)
 - อัปเดต list หลังลบ
 
 หมายเหตุ
@@ -186,6 +190,7 @@ const avatarUrl = `${API_BASE_URL}${user.profileImageUrl}`;
 - Profile Page (แก้ชื่อ/bio + อัปโหลดรูป)
 - Media Library Page (upload/list/delete)
 - Gig List + Filter Page
+- Gig Manage Page (create/edit + upload media)
 - Order List Page
 
 ## 10) React Query key ที่แนะนำ
@@ -202,16 +207,16 @@ const avatarUrl = `${API_BASE_URL}${user.profileImageUrl}`;
 ## 11) Checklist ก่อนส่งงาน
 
 - login/register/logout ทำงานครบ
-- refresh หน้าแล้วยังรักษาสถานะ login ได้ (ผ่าน cookie session)
+- refresh หน้าแล้วยังรักษาสถานะ login ได้ (ผ่าน token storage ที่ปลอดภัย)
 - upload profile image ได้จริง
 - upload media ได้และเห็น thumbnail
 - delete media แล้ว list อัปเดต
 - เมื่อไม่มี x-api-key (ในกรณีบังคับ) frontend แสดงข้อความ error ชัดเจน
-- ทุก request สำคัญใช้ credentials include/withCredentials แล้ว
+- ทุก request ที่ต้อง login มี Authorization: Bearer แนบแล้ว
 
 ## 12) ปัญหาที่เจอบ่อย
 
-- ลืมใส่ credentials include ทำให้ /auth/me เป็น 401 ตลอด
+- ลืมส่ง Authorization Bearer token ทำให้ /auth/me หรือ profile/media เป็น 401
 - ส่ง field upload ผิดชื่อ (ต้องเป็น image หรือ file ตาม endpoint)
 - ลืมส่ง x-api-key ตอนเปิด API_KEY_REQUIRED=true
 - นำ URL รูปไปใช้โดยไม่ต่อ API base URL
