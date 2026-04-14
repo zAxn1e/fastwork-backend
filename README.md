@@ -150,7 +150,7 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fastwork_mini?schema
 
 - DATABASE_URL: Prisma PostgreSQL connection string
 - PORT: พอร์ตของ API server (ค่าเริ่มต้น 3000)
-- OPENAPI_SERVER_URL: base URL ที่จะแสดงใน Swagger/OpenAPI `servers` (เช่น `https://api.example.com`)
+- OPENAPI_SERVER_URL: base URL สำหรับ OpenAPI `servers` และ URL ที่ Swagger UI ใช้โหลด `/openapi.json` (เช่น `https://api.example.com`)
 - INTERNAL_API_KEY: API key ที่บังคับใช้กับทุก endpoint ยกเว้น /health
 - API_KEY_REQUIRED: เปิด/ปิดการบังคับ x-api-key (`true` หรือ `false`)
 - JWT_SECRET: secret สำหรับ sign JWT token
