@@ -11,6 +11,11 @@ function normalizePathPrefix(value, fallback) {
   return raw.startsWith("/") ? raw : `/${raw}`;
 }
 
+function normalizeBaseUrl(value, fallback) {
+  const raw = (value || fallback || "").trim();
+  return raw.replace(/\/+$/, "");
+}
+
 function parseBoolean(value, defaultValue) {
   if (value === undefined) {
     return defaultValue;
@@ -40,4 +45,8 @@ module.exports = {
   frontendDocsEnabled: parseBoolean(process.env.FRONTEND_DOCS_ENABLED, true),
   frontendDocsPath: normalizePathPrefix(process.env.FRONTEND_DOCS_PATH, "/frontend-guide"),
   frontendDocsDistDir: process.env.FRONTEND_DOCS_DIST_DIR || "frontend-docs/build",
+  openApiServerUrl: normalizeBaseUrl(
+    process.env.OPENAPI_SERVER_URL,
+    `http://localhost:${port}`,
+  ),
 };

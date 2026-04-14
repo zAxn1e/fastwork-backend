@@ -1,4 +1,4 @@
-const { apiKeyRequired, jwtExpiresIn, port } = require("@/config/env");
+const { apiKeyRequired, jwtExpiresIn, openApiServerUrl } = require("@/config/env");
 
 const protectedSecurity = apiKeyRequired ? [{ ApiKeyAuth: [] }] : [];
 const jwtSecurity = [{ BearerAuth: [] }];
@@ -14,7 +14,7 @@ const openApiSpec = {
     description:
       "Internal API for mini freelance marketplace (Fastwork-like class project).",
   },
-  servers: [{ url: `http://localhost:${port}` }],
+  servers: [{ url: openApiServerUrl }],
   tags: [
     { name: "Health" },
     { name: "Auth" },
