@@ -93,6 +93,7 @@ Error
 #### POST /auth/register
 
 สมัครผู้ใช้ใหม่และคืน JWT ทันที
+- fields ที่รับ: `firstname`, `lastname`, `birthday`, `telephoneNumber`, `email`, `password`, `skills[]`
 - role ที่เปิดให้สมัครได้: `CLIENT`, `FREELANCER`
 
 #### POST /auth/login
@@ -115,7 +116,7 @@ Error
 
 #### PATCH /profile
 
-แก้ไขข้อมูลโปรไฟล์ (`displayName`, `bio`)
+แก้ไขข้อมูลโปรไฟล์ (`firstname`, `lastname`, `birthday`, `telephoneNumber`, `skills`, `bio`)
 
 #### POST /profile/image
 

@@ -110,6 +110,7 @@ frontend ควร map message ไปแสดง toast/alert ให้ user เ
 ## 6.1 Register
 
 - เรียก POST /auth/register
+- body ที่ต้องส่ง: `firstname`, `lastname`, `birthday`, `telephoneNumber`, `email`, `password`, `skills[]`
 - สำเร็จแล้วถือว่า login ทันที (ได้ JWT token)
 - redirect ไปหน้า profile หรือ dashboard
 
@@ -136,6 +137,7 @@ frontend ควร map message ไปแสดง toast/alert ให้ user เ
 
 - GET /profile
 - PATCH /profile
+- ฟิลด์ที่แก้ไขได้: `firstname`, `lastname`, `birthday`, `telephoneNumber`, `skills`, `bio`
 
 ## 7.2 อัปโหลดรูปโปรไฟล์
 
@@ -188,7 +190,7 @@ const avatarUrl = `${API_BASE_URL}${user.profileImageUrl}`;
 
 - Login Page
 - Register Page
-- Profile Page (แก้ชื่อ/bio + อัปโหลดรูป)
+- Profile Page (แก้ชื่อ-นามสกุล/เบอร์/วันเกิด/skills/bio + อัปโหลดรูป)
 - Media Library Page (upload/list/delete)
 - Gig List + Filter Page
 - Gig Manage Page (create/edit + upload media)

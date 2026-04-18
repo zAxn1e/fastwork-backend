@@ -1,6 +1,6 @@
-# Fastwork Mini Internal API
+# BigWork Internal API
 
-โปรเจกต์นี้เป็น backend API แบบ Internal-use สาหรับระบบ freelance marketplace ขนาดเล็ก (แนว Fastwork) เพื่อใช้ใน Project Demo ของงานกลุ่ม
+โปรเจกต์นี้เป็น backend API แบบ Internal-use สาหรับระบบ freelance marketplace ของ BigWork เพื่อใช้ใน Project Demo ของงานกลุ่ม
 
 ## 1) ภาพรวมโปรเจกต์
 
@@ -135,13 +135,13 @@ docker compose down -v
 ค่า default ของ DB ใน compose:
 - user: `postgres`
 - password: `postgres`
-- db: `fastwork_mini`
+- db: `bigwork_mini`
 - port: `5432`
 
 ดังนั้น `DATABASE_URL` ใน `.env` ใช้ค่า default นี้ได้ทันที:
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fastwork_mini?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bigwork_mini?schema=public"
 ```
 
 ## 5) Environment Variables
@@ -235,7 +235,8 @@ Auth endpoints
 - POST /auth/login
 - POST /auth/logout
 - GET /auth/me
-- หมายเหตุ: `/auth/register` อนุญาต role เฉพาะ `CLIENT`, `FREELANCER`
+- หมายเหตุ: `/auth/register` รับ `firstname`, `lastname`, `birthday`, `telephoneNumber`, `email`, `password`, `skills[]`
+- role ที่เปิดให้สมัครได้: `CLIENT`, `FREELANCER`
 
 Profile endpoints (ต้องแนบ JWT ก่อน)
 - GET /profile
@@ -326,7 +327,7 @@ Register
 ```bash
 curl -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"newuser@example.com","password":"Password123!","displayName":"New User"}'
+  -d '{"firstname":"New","lastname":"User","birthday":"1998-01-15","telephoneNumber":"0890000000","email":"newuser@example.com","password":"Password123!","skills":["Design","Figma"]}'
 ```
 
 Login (รับ JWT)

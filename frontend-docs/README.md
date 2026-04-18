@@ -1,4 +1,4 @@
-# Fastwork Frontend Docs (Docusaurus)
+# BigWork Frontend Docs (Docusaurus)
 
 ## Start
 
@@ -26,6 +26,6 @@ npm run build
 
 ## Notes
 
-- This docs site is for frontend team integration with fastwork-backend.
+- This docs site is for frontend team integration with bigwork-backend.
 - Backend API summary is in ../docs/API.md
 - Swagger UI is served by backend at `${VITE_API_BASE_URL}/docs` (local example: `http://localhost:3000/docs`)

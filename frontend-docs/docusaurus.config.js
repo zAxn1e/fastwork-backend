@@ -1,14 +1,14 @@
 // @ts-check
 
 const config = {
-  title: "Fastwork Frontend Guide",
-  tagline: "Frontend integration handbook for fastwork-backend",
+  title: "BigWork Frontend Guide",
+  tagline: "Frontend integration handbook for bigwork-backend",
 
   url: "https://example.com",
   baseUrl: "/frontend-guide/",
 
   organizationName: "team",
-  projectName: "fastwork-frontend-docs",
+  projectName: "bigwork-frontend-docs",
 
   onBrokenLinks: "throw",
 
@@ -36,7 +36,7 @@ const config = {
 
   themeConfig: {
     navbar: {
-      title: "Fastwork Frontend Guide",
+      title: "BigWork Frontend Guide",
       items: [
         {
           type: "docSidebar",

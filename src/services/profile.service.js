@@ -27,6 +27,13 @@ async function getProfile(userId) {
 }
 
 async function updateProfile(userId, payload) {
+  if (payload.firstName !== undefined || payload.lastName !== undefined) {
+    const existing = await getProfile(userId);
+    const firstName = payload.firstName ?? existing.firstName ?? "";
+    const lastName = payload.lastName ?? existing.lastName ?? "";
+    payload.displayName = `${firstName} ${lastName}`.trim();
+  }
+
   return prisma.user.update({
     where: { id: userId },
     data: payload,
