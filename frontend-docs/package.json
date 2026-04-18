@@ -1,8 +1,8 @@
 {
-  "name": "fastwork-frontend-docs",
+  "name": "bigwork-frontend-docs",
   "version": "1.0.0",
   "private": true,
-  "description": "Docusaurus guide for frontend team integrating with fastwork-backend",
+  "description": "Docusaurus guide for frontend team integrating with bigwork-backend",
   "scripts": {
     "start": "docusaurus start",
     "build": "docusaurus build",

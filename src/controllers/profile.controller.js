@@ -1,7 +1,7 @@
 const path = require("path");
 const asyncHandler = require("@/utils/asyncHandler");
 const { AppError, sendSuccess } = require("@/utils/http");
-const { requireNonEmptyString } = require("@/utils/validation");
+const { requireDate, requireNonEmptyString, requireStringArray } = require("@/utils/validation");
 const { sanitizeUser } = require("@/utils/sanitizeUser");
 const profileService = require("@/services/profile.service");
 
@@ -13,8 +13,37 @@ const getProfile = asyncHandler(async (req, res) => {
 const updateProfile = asyncHandler(async (req, res) => {
   const payload = {};
 
-  if (req.body.displayName !== undefined) {
-    payload.displayName = requireNonEmptyString(req.body.displayName, "displayName");
+  if (req.body.firstname !== undefined || req.body.firstName !== undefined) {
+    payload.firstName = requireNonEmptyString(
+      req.body.firstname ?? req.body.firstName,
+      "firstname",
+    );
+  }
+
+  if (req.body.lastname !== undefined || req.body.lastName !== undefined) {
+    payload.lastName = requireNonEmptyString(
+      req.body.lastname ?? req.body.lastName,
+      "lastname",
+    );
+  }
+
+  if (req.body.birthday !== undefined) {
+    payload.birthday = requireDate(req.body.birthday, "birthday");
+  }
+
+  if (
+    req.body.telephoneNumber !== undefined ||
+    req.body.telephone !== undefined ||
+    req.body.phoneNumber !== undefined
+  ) {
+    payload.telephoneNumber = requireNonEmptyString(
+      req.body.telephoneNumber ?? req.body.telephone ?? req.body.phoneNumber,
+      "telephoneNumber",
+    );
+  }
+
+  if (req.body.skills !== undefined) {
+    payload.skills = requireStringArray(req.body.skills, "skills");
   }
 
   if (req.body.bio !== undefined) {

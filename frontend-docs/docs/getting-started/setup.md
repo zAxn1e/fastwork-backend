@@ -11,8 +11,8 @@ title: Setup และ Bootstrapping
 ## สร้างโปรเจกต์ frontend (ตัวอย่าง Vite + React)
 
 ```bash
-npm create vite@latest fastwork-frontend -- --template react
-cd fastwork-frontend
+npm create vite@latest bigwork-frontend -- --template react
+cd bigwork-frontend
 npm install
 ```
 

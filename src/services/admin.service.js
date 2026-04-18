@@ -49,6 +49,18 @@ function buildUserWhere(filters) {
           mode: "insensitive",
         },
       },
+      {
+        firstName: {
+          contains: filters.q,
+          mode: "insensitive",
+        },
+      },
+      {
+        lastName: {
+          contains: filters.q,
+          mode: "insensitive",
+        },
+      },
     ];
   }
 
@@ -140,6 +152,12 @@ async function updateUser(id, payload, actorUserId) {
     payload.role !== existing.role
   ) {
     throw new AppError(400, "You cannot change your own role");
+  }
+
+  if (payload.firstName !== undefined || payload.lastName !== undefined) {
+    const firstName = payload.firstName ?? existing.firstName ?? "";
+    const lastName = payload.lastName ?? existing.lastName ?? "";
+    payload.displayName = `${firstName} ${lastName}`.trim();
   }
 
   return prisma.user.update({

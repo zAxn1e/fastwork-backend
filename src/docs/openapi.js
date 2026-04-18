@@ -9,10 +9,10 @@ const protectedWithJwtSecurity = apiKeyRequired
 const openApiSpec = {
   openapi: "3.0.3",
   info: {
-    title: "Fastwork Mini Internal API",
+    title: "BigWork Internal API",
     version: "1.0.0",
     description:
-      "Internal API for mini freelance marketplace (Fastwork-like class project).",
+      "Internal API for BigWork freelance marketplace.",
   },
   servers: openApiServerUrls.map((url) => ({ url })),
   tags: [
@@ -63,6 +63,11 @@ const openApiSpec = {
         properties: {
           id: { type: "integer", example: 2 },
           email: { type: "string", example: "freelancer1@internal.local" },
+          firstname: { type: "string", example: "Narin" },
+          lastname: { type: "string", example: "Dev" },
+          birthday: { type: "string", format: "date-time", example: "1996-04-21T00:00:00.000Z" },
+          telephoneNumber: { type: "string", example: "0811111111" },
+          skills: { type: "array", items: { type: "string" }, example: ["Backend", "Node.js"] },
           displayName: { type: "string", example: "Narin Dev" },
           role: { type: "string", enum: ["CLIENT", "FREELANCER", "ADMIN"] },
           bio: { type: "string", nullable: true },
@@ -270,11 +275,27 @@ const openApiSpec = {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["email", "password", "displayName"],
+                required: [
+                  "firstname",
+                  "lastname",
+                  "birthday",
+                  "telephoneNumber",
+                  "email",
+                  "password",
+                  "skills",
+                ],
                 properties: {
+                  firstname: { type: "string", example: "New" },
+                  lastname: { type: "string", example: "User" },
+                  birthday: { type: "string", format: "date-time", example: "1998-01-15T00:00:00.000Z" },
+                  telephoneNumber: { type: "string", example: "0890000000" },
                   email: { type: "string", example: "newuser@example.com" },
                   password: { type: "string", minLength: 6, example: "Password123!" },
-                  displayName: { type: "string", example: "New User" },
+                  skills: {
+                    type: "array",
+                    items: { type: "string" },
+                    example: ["Design", "Figma", "UI/UX"],
+                  },
                   role: { type: "string", enum: ["CLIENT", "FREELANCER"], default: "CLIENT" },
                   bio: { type: "string" },
                 },
@@ -292,7 +313,12 @@ const openApiSpec = {
                   data: {
                     user: {
                       id: 9,
+                      firstname: "New",
+                      lastname: "User",
+                      birthday: "1998-01-15T00:00:00.000Z",
+                      telephoneNumber: "0890000000",
                       email: "newuser@example.com",
+                      skills: ["Design", "Figma", "UI/UX"],
                       displayName: "New User",
                       role: "CLIENT",
                     },
@@ -347,7 +373,12 @@ const openApiSpec = {
                   data: {
                     user: {
                       id: 4,
+                      firstname: "Acme",
+                      lastname: "Team",
+                      birthday: "1992-11-12T00:00:00.000Z",
+                      telephoneNumber: "0833333333",
                       email: "client1@internal.local",
+                      skills: ["Product", "Planning"],
                       displayName: "Client One",
                       role: "CLIENT",
                     },
@@ -434,7 +465,11 @@ const openApiSpec = {
               schema: {
                 type: "object",
                 properties: {
-                  displayName: { type: "string" },
+                  firstname: { type: "string" },
+                  lastname: { type: "string" },
+                  birthday: { type: "string", format: "date-time" },
+                  telephoneNumber: { type: "string" },
+                  skills: { type: "array", items: { type: "string" } },
                   bio: { type: "string" },
                 },
               },
@@ -1178,7 +1213,7 @@ const openApiSpec = {
         summary: "List users (admin)",
         security: protectedWithJwtSecurity,
         parameters: [
-          { in: "query", name: "q", schema: { type: "string" }, description: "Search by email/displayName" },
+          { in: "query", name: "q", schema: { type: "string" }, description: "Search by email/name" },
           { in: "query", name: "role", schema: { type: "string", enum: ["CLIENT", "FREELANCER", "ADMIN"] } },
         ],
         responses: {
@@ -1245,7 +1280,11 @@ const openApiSpec = {
               schema: {
                 type: "object",
                 properties: {
-                  displayName: { type: "string" },
+                  firstname: { type: "string" },
+                  lastname: { type: "string" },
+                  birthday: { type: "string", format: "date-time" },
+                  telephoneNumber: { type: "string" },
+                  skills: { type: "array", items: { type: "string" } },
                   bio: { type: "string" },
                   role: { type: "string", enum: ["CLIENT", "FREELANCER", "ADMIN"] },
                 },

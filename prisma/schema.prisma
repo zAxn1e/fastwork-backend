@@ -25,6 +25,11 @@ model User {
   email        String    @unique
   passwordHash String
   displayName  String
+  firstName    String?
+  lastName     String?
+  birthday     DateTime?
+  telephoneNumber String?
+  skills       String[]  @default([])
   role         Role
   bio          String?
   profileImageUrl String?
