@@ -71,6 +71,31 @@ function requireEnum(value, fieldName, allowedValues) {
   return value;
 }
 
+function requireDate(value, fieldName) {
+  const raw = requireNonEmptyString(value, fieldName);
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) {
+    throw new AppError(400, `${fieldName} must be a valid date`);
+  }
+  return date;
+}
+
+function requireStringArray(value, fieldName, minItems = 0) {
+  if (!Array.isArray(value)) {
+    throw new AppError(400, `${fieldName} must be an array of strings`);
+  }
+
+  const normalized = value.map((item, index) =>
+    requireNonEmptyString(item, `${fieldName}[${index}]`),
+  );
+
+  if (normalized.length < minItems) {
+    throw new AppError(400, `${fieldName} must contain at least ${minItems} item(s)`);
+  }
+
+  return [...new Set(normalized)];
+}
+
 module.exports = {
   parseId,
   parseOptionalId,
@@ -80,4 +105,6 @@ module.exports = {
   optionalPositiveInt,
   requireRating,
   requireEnum,
+  requireDate,
+  requireStringArray,
 };

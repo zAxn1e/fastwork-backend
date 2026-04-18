@@ -1,7 +1,7 @@
 {
-  "name": "fastwork-project",
+  "name": "bigwork-project",
   "version": "1.0.0",
-  "description": "Internal freelance marketplace API (mini Fastwork-like project)",
+  "description": "Internal freelance marketplace API for BigWork",
   "main": "server.js",
   "_moduleAliases": {
     "@": "src"

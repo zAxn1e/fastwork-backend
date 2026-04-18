@@ -1,6 +1,11 @@
 const asyncHandler = require("@/utils/asyncHandler");
-const { sendSuccess } = require("@/utils/http");
-const { requireEnum, requireNonEmptyString } = require("@/utils/validation");
+const { AppError, sendSuccess } = require("@/utils/http");
+const {
+  requireDate,
+  requireEnum,
+  requireNonEmptyString,
+  requireStringArray,
+} = require("@/utils/validation");
 const authService = require("@/services/auth.service");
 const { sanitizeUser } = require("@/utils/sanitizeUser");
 const { jwtExpiresIn } = require("@/config/env");
@@ -19,7 +24,20 @@ function validatePassword(password) {
 const register = asyncHandler(async (req, res) => {
   const email = requireNonEmptyString(req.body.email, "email").toLowerCase();
   const password = validatePassword(req.body.password);
-  const displayName = requireNonEmptyString(req.body.displayName, "displayName");
+  const firstName = requireNonEmptyString(
+    req.body.firstname ?? req.body.firstName,
+    "firstname",
+  );
+  const lastName = requireNonEmptyString(
+    req.body.lastname ?? req.body.lastName,
+    "lastname",
+  );
+  const birthday = requireDate(req.body.birthday, "birthday");
+  const telephoneNumber = requireNonEmptyString(
+    req.body.telephoneNumber ?? req.body.telephone ?? req.body.phoneNumber,
+    "telephoneNumber",
+  );
+  const skills = requireStringArray(req.body.skills, "skills", 1);
   const role =
     req.body.role !== undefined
       ? requireEnum(req.body.role, "role", ALLOWED_ROLES)
@@ -30,7 +48,11 @@ const register = asyncHandler(async (req, res) => {
   const user = await authService.register({
     email,
     password,
-    displayName,
+    firstName,
+    lastName,
+    birthday,
+    telephoneNumber,
+    skills,
     role,
     bio,
   });

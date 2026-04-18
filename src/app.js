@@ -26,7 +26,11 @@ const cors = require("cors");
 const app = express();
 
 app.use(cors({
-  origin: "*",
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow no-origin
+    return callback(null, origin);
+  },
+  credentials: true,
   allowedHeaders: ["Content-Type", "x-api-key", "Authorization"],
 }));
 app.use(express.json());
@@ -126,7 +130,7 @@ app.use(
     swaggerUi.serve,
     swaggerUi.setup(undefined, {
         explorer: true,
-        customSiteTitle: "Fastwork Mini Internal API Docs",
+        customSiteTitle: "BigWork Internal API Docs",
         swaggerOptions: {
             url: "/openapi.json",
         },

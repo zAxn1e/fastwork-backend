@@ -17,7 +17,12 @@ async function register(payload) {
     data: {
       email: payload.email,
       passwordHash,
-      displayName: payload.displayName,
+      displayName: `${payload.firstName} ${payload.lastName}`.trim(),
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      birthday: payload.birthday,
+      telephoneNumber: payload.telephoneNumber,
+      skills: payload.skills,
       role: payload.role || "CLIENT",
       bio: payload.bio,
     },
