@@ -8,6 +8,24 @@ title: Setup และ Bootstrapping
 - npm
 - backend ที่เข้าถึงได้จาก frontend (local หรือ deploy domain ก็ได้)
 
+## เตรียม backend (แนะนำสำหรับรับงานต่อในทีม)
+
+รันในโปรเจกต์ `fastwork-backend`:
+
+```bash
+npm install
+copy .env.example .env
+docker compose up -d
+npm run prisma:push
+npm run db:seed
+npm run dev
+```
+
+เช็กว่า backend พร้อมก่อนเริ่ม frontend:
+
+- `http://localhost:3000/health`
+- `http://localhost:3000/docs`
+
 ## สร้างโปรเจกต์ frontend (ตัวอย่าง Vite + React)
 
 ```bash
