@@ -4,6 +4,14 @@
 
 คู่มือนี้สรุปแนวทางทำ frontend ให้เชื่อมกับ backend นี้แบบใช้งานจริงได้เร็ว และยังดูแลรักษาง่ายสำหรับงานทีม
 
+## Quick handoff สำหรับทีม frontend
+
+ถ้าจะส่งงานให้เพื่อนรับช่วงต่อ ให้เริ่มตามลำดับนี้:
+
+1. ให้เพื่อนรัน backend ตาม runbook: `docs/TEAMMATE_BACKEND_INSTRUCTIONS.md`
+2. ให้เพื่อนเปิด Swagger (`/docs`) เพื่อเช็ก request/response ล่าสุด
+3. ให้เพื่อนเปิด frontend docs (`/frontend-guide`) เพื่อทำตาม flow แบบหน้า-ต่อ-หน้า
+
 ## 1) เป้าหมายของ frontend
 
 - แสดงข้อมูลหลัก: categories, gigs, orders, reviews
