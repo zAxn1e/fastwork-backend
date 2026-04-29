@@ -10,7 +10,7 @@ title: Setup และ Bootstrapping
 
 ## เตรียม backend (แนะนำสำหรับรับงานต่อในทีม)
 
-รันในโปรเจกต์ `fastwork-backend`:
+รันในโปรเจกต์ `bigwork-backend`:
 
 ```bash
 npm install
