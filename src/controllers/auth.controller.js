@@ -45,7 +45,7 @@ const register = asyncHandler(async (req, res) => {
   // const bio =
   //   req.body.bio !== undefined ? requireNonEmptyString(req.body.bio, "bio") : undefined;
 
-  const bio = "";
+  let bio = "";
   try {
     bio = requireNonEmptyString(req.body.bio);
   } catch (err) {
