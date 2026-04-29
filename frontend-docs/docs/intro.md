@@ -17,8 +17,8 @@ slug: /
 
 - Swagger UI (local default): `http://localhost:3000/docs`
 - OpenAPI JSON (local default): `http://localhost:3000/openapi.json`
-- Teammate backend runbook: `../docs/TEAMMATE_BACKEND_INSTRUCTIONS.md`
-- Backend summary: ../docs/API.md
+- Teammate backend runbook: `../../docs/TEAMMATE_BACKEND_INSTRUCTIONS.md`
+- Backend summary: ../../docs/API.md
 
 ## ลำดับเริ่มทำที่แนะนำ
 
