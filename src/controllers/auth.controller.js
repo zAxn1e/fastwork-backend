@@ -42,8 +42,15 @@ const register = asyncHandler(async (req, res) => {
     req.body.role !== undefined
       ? requireEnum(req.body.role, "role", ALLOWED_ROLES)
       : "CLIENT";
-  const bio =
-    req.body.bio !== undefined ? requireNonEmptyString(req.body.bio, "bio") : undefined;
+  // const bio =
+  //   req.body.bio !== undefined ? requireNonEmptyString(req.body.bio, "bio") : undefined;
+
+  const bio = "";
+  try {
+    bio = requireNonEmptyString(req.body.bio);
+  } catch (err) {
+    bio = "No bio yet."
+  }
 
   const user = await authService.register({
     email,
