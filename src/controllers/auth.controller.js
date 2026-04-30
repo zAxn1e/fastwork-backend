@@ -47,6 +47,7 @@ const register = asyncHandler(async (req, res) => {
     (typeof req.body.bio === "string" && req.body.bio.trim() === "")
       ? "No bio yet."
       : requireNonEmptyString(req.body.bio, "bio");
+  
   const user = await authService.register({
     email,
     password,
