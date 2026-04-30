@@ -192,6 +192,31 @@ npm run start:with-frontend-docs
 
 ค่าเริ่มต้นเซิร์ฟเวอร์จะรันที่ http://localhost:3000
 
+## Quick Start สำหรับส่งให้เพื่อนในทีม (Backend พร้อมรัน)
+
+ใช้ชุดคำสั่งนี้เพื่อให้เพื่อน clone แล้วรัน backend ได้ทันทีในเครื่อง local
+
+```bash
+npm install
+copy .env.example .env
+docker compose up -d
+npm run prisma:push
+npm run db:seed
+npm run dev
+```
+
+สิ่งที่เพื่อนต้องเปิดเช็กหลังรัน:
+
+- Health: http://localhost:3000/health
+- Swagger: http://localhost:3000/docs
+- OpenAPI: http://localhost:3000/openapi.json
+
+บัญชีทดสอบจาก seed:
+
+- admin: `admin@internal.local` / `Password123!`
+- freelancer: `freelancer1@internal.local` / `Password123!`
+- client: `client1@internal.local` / `Password123!`
+
 Swagger docs
 - UI: http://localhost:3000/docs
 - OpenAPI JSON: http://localhost:3000/openapi.json
@@ -209,6 +234,7 @@ Frontend docs (เสิร์ฟจาก backend)
 เอกสารเพิ่มเติม
 - API summary: docs/API.md
 - Frontend integration guide (ละเอียด): docs/FRONTEND_GUIDE.md
+- Team handoff (backend runbook): docs/TEAMMATE_BACKEND_INSTRUCTIONS.md
 - Frontend docs site (Docusaurus): frontend-docs/
 
 ## 8) การ seed ข้อมูล
